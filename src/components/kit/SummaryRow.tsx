@@ -10,13 +10,20 @@ export const SummaryRow: React.FC<{
   note?: string
   className?: string
 }> = ({ label, value, emphasis, note, className }) => (
-  <div className={cn('flex items-center justify-between', className)}>
-    <span className={cn('text-[12.5px]', emphasis ? 'font-bold text-forest' : 'text-sage')}>{label}</span>
+  <div className={cn('flex items-center justify-between py-1', className)}>
+    <span className={cn('text-[13px]', emphasis ? 'font-bold text-forest text-[14px]' : 'text-pine/80')}>
+      {label}
+    </span>
     <span className="flex flex-col items-end">
-      <span className={cn('text-[13px]', emphasis ? 'text-[15px] font-bold text-forest' : 'text-forest')}>
+      <span
+        className={cn(
+          'tabular-nums',
+          emphasis ? 'text-[17px] sm:text-[18px] font-bold text-forest font-display' : 'text-[13.5px] font-semibold text-forest',
+        )}
+      >
         {value}
       </span>
-      {note ? <span className="text-[10.5px] text-sage">{note}</span> : null}
+      {note ? <span className="text-[11px] text-sage">{note}</span> : null}
     </span>
   </div>
 )
