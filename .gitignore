@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+build/
+dist/
+
+# env — never commit real values
+.env
+.env.*
+!.env.example
+
+# payload
+.payload/
+
+# OS / logs
+.DS_Store
+*.log
+
+# deploy
+.vercel/
+
+# IDE
+.idea/
+.vscode/
+
+# agent-generated dirs
+.commandcode/
+.claude/
+.cursor/
+.codex/
+.copilot/
+.windsurf/
+.augment/
+.continue/
+.aider/
+.gemini/
+.opencode/
+
+# Planning & learning docs — private, synced to engineering-handbook
+/docs
+/docs/
