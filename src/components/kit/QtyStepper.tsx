@@ -20,13 +20,13 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({ value, onChange, min = 1
   const atMax = typeof max === 'number' && value >= max
   const atMin = value <= min
   const btn =
-    'flex items-center justify-center rounded-full outline outline-1 outline-line outline-offset-[-0.5px] text-forest bg-white hover:bg-tint disabled:opacity-40 disabled:hover:bg-white'
-  const dim = size === 'sm' ? 'h-[26px] w-[26px]' : 'h-[30px] w-[30px]'
-  const icon = size === 'sm' ? 'h-[13px] w-[13px]' : 'h-[15px] w-[15px]'
+    'flex items-center justify-center rounded-full border border-line text-forest bg-white hover:bg-tint active:scale-95 transition-all disabled:opacity-40 disabled:hover:bg-white disabled:active:scale-100 shadow-2xs'
+  const dim = size === 'sm' ? 'h-7 w-7' : 'h-9 w-9'
+  const icon = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4'
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-[10px]">
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           aria-label="Kurangi lisensi"
@@ -36,7 +36,7 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({ value, onChange, min = 1
         >
           <Minus className={icon} />
         </button>
-        <span className="min-w-[64px] text-center text-[13px] text-forest">
+        <span className="min-w-[70px] text-center text-[13.5px] font-semibold text-forest tabular-nums">
           {value} lisensi
         </span>
         <button
@@ -49,7 +49,7 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({ value, onChange, min = 1
           <Plus className={icon} />
         </button>
       </div>
-      {maxLabel ? <span className="text-[11px] text-warn">{maxLabel}</span> : null}
+      {maxLabel ? <span className="text-[11.5px] font-medium text-warn">{maxLabel}</span> : null}
     </div>
   )
 }

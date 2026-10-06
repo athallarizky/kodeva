@@ -22,7 +22,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, .
   return (
     <div
       role="radiogroup"
-      className="flex w-full gap-[6px] rounded-full bg-tint p-[4px]"
+      className="flex w-full gap-1 rounded-full bg-tint/80 p-1 border border-line/50"
       {...rest}
     >
       {options.map((opt) => {
@@ -35,13 +35,15 @@ export function SegmentedControl<T extends string>({ options, value, onChange, .
             aria-checked={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-[6px] rounded-full px-[10px] py-[9px] text-[12.5px] leading-none transition-all',
-              active ? 'bg-white text-forest shadow-seg' : 'text-sage hover:text-forest',
+              'flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12.5px] font-medium leading-none transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+              active
+                ? 'bg-white text-forest font-semibold shadow-xs border border-line/40'
+                : 'text-sage hover:text-forest hover:bg-white/40',
             )}
           >
             <span className="capitalize">{opt.label}</span>
             {opt.badge ? (
-              <span className="rounded-full bg-tint-2 px-[7px] py-[3px] text-[10px] font-bold text-forest">
+              <span className="rounded-full bg-forest text-white px-2 py-0.5 text-[9.5px] font-bold tracking-tight shadow-2xs">
                 {opt.badge}
               </span>
             ) : null}

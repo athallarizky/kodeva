@@ -6,11 +6,11 @@ import { cn } from '@/utilities/ui'
 export const StickyBar: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
   <div
     className={cn(
-      'fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-[16px] pb-[calc(12px+env(safe-area-inset-bottom))] pt-[12px] backdrop-blur',
-      'md:static md:mb-6 md:rounded-[14px] md:border md:border-line md:px-[18px] md:py-[14px] md:shadow-card',
+      'fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-white/90 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md shadow-lg',
+      'lg:hidden',
       className,
     )}
   >
-    <div className="container md:max-w-none md:p-0">{children}</div>
+    <div className="container">{children}</div>
   </div>
 )
