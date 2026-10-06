@@ -87,6 +87,12 @@ Format per entry: apa yang AI hasilkan → bagaimana ketahuan → cara perbaiki 
 **Cara perbaiki:** (1) dedup DB: sisakan id terkecil per (skenario, seed) — 820 baris duplikat dihapus; (2) runner ulang dengan salt EKSPLISIT berurutan (8001, 8002, …) yang mustahil tabrakan; (3) tambah script `check-dupes` sebagai gerbang verifikasi sebelum analisis.
 **Verifikasi akhir:** setelah top-up, `check-dupes` = nol duplikat dan hitungan unik ≥500/skenario; kesimpulan riset hanya diambil dari data terverifikasi unik.
 
+### 3.12 — Optimasi Lighthouse lolos build lokal, gagal build Vercel (2026-10-06, sprint-3)
+**Apa yang AI hasilkan:** Lazy-load `AdminBar` via `next/dynamic(..., { ssr: false })` langsung di `layout.tsx` (Server Component) untuk menurunkan Lighthouse 79→96. Verifikasi: `next build` lokal **lolos** → langsung acp + deploy.
+**Bagaimana ketahuan:** Build Vercel gagal — `ssr: false is not allowed with next/dynamic in Server Components`. Build lokal (Turbopack) ternyata lebih longgar daripada pipeline build Vercel; "build lokal hijau" bukan bukti build produksi hijau.
+**Cara perbaiki:** Bungkus di Client Component kecil (`AdminBar/Lazy.tsx` ber-'use client' + dynamic ssr:false), layout tinggal import. Verifikasi ulang: clean build lokal (`rm -rf .next`) + deploy → Ready.
+**Verifikasi akhir:** production semua route 200 (deploy `nf5mci430`); Lighthouse tetap 95–98. Proses baru: setelah acp yang menyentuh build config/komponen server, deploy CLI dilakukan SEBELUM menganggap selesai (bukan setelahnya), karena git integration sedang mati.
+
 ## 4. Implementasi yang banyak dibantu AI + edge case yang diuji
 - **Scaffold & wiring (sprint-1 Phase 0.1, 2026-10-06):** merge template resmi + swap adapter postgres + resolusi dependency (dedupe tsx). Edge yang diuji: boot `next dev` (lulus), perintah CLI payload standalone (gagal → RCA + bypass strategis), 3 varian undici × 2 versi Node (gagal konsisten — memuluskan isolasi penyebab ke loader, bukan versi).
 - **Collections + access + seed (Phase 1, 2026-10-06):** schema products/leads/vouchers, roles admin/editor, seed konten dengan gambar digenerate SVG→PNG (edge: `&` harus di-escape di XML SVG — "HR & Payroll" membatalkan sharp). Akses diverifikasi via API anonim (leads/users 403, vouchers 200).
