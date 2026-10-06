@@ -53,9 +53,16 @@ Format per entry: apa yang AI hasilkan → bagaimana ketahuan → cara perbaiki 
 **Cara perbaiki:** (1) prompt bisa dijawab di PTY palsu: `script -q /dev/null` + kirim `\r` berkala; (2) sisa diff diselesaikan manual via SQL idempoten (ADD/DROP COLUMN + DROP TYPE) — lengkap di RCA §6.
 **Verifikasi akhir:** boot berikutnya `Pulling schema ✓` tanpa prompt; `/admin`, `/api/products`, `/api/vouchers` 200; `/api/leads` 403 untuk anonim (access control bekerja); `tsc --noEmit` + `next build` lulus. RCA: `docs/sprint-1/rca/2026-10-06-drizzle-push-interactive-prompt.md` (handbook). Bonus temuan: ID postgres Payload = **integer** — desain cart (`productId: number`) ternyata tepat.
 
+### 3.7 — Validasi honeypot ditaruh di layer yang salah (2026-10-06, Phase 4.2)
+**Apa yang AI hasilkan:** `leadInputSchema` memakai `honeypot: z.string().max(0)` — menolak honeypot non-kosong langsung di zod (layer 1).
+**Bagaimana ketahuan:** Uji curl cabang anti-spam: honeypot terisi balas **400** dengan pesan validasi, bukan **422 berbentuk sukses** sesuai kontrak — respons 400 justru memberi tahu bot bahwa ia terdeteksi (kontrak api-contract §2 langkah 2 eksplisit soal ini).
+**Cara perbaiki:** Schema menerima string hingga 500 char; kekosongan diperiksa HANYA di route sebagai langkah anti-spam (422 `{"ok":true,"leadId":null}` + log). Test schemas menulis regresi ini secara eksplisit ("honeypot non-kosong tetap lolos zod").
+**Verifikasi akhir:** curl ulang → `{"ok":true,"leadId":null}` status 422; 7 cabang API leads/orders hijau semua.
+
 ## 4. Implementasi yang banyak dibantu AI + edge case yang diuji
 - **Scaffold & wiring (sprint-1 Phase 0.1, 2026-10-06):** merge template resmi + swap adapter postgres + resolusi dependency (dedupe tsx). Edge yang diuji: boot `next dev` (lulus), perintah CLI payload standalone (gagal → RCA + bypass strategis), 3 varian undici × 2 versi Node (gagal konsisten — memuluskan isolasi penyebab ke loader, bukan versi).
-- *(target berikutnya — sprint-1: validasi kuota agregat lintas paket + hydration keranjang persist; diisi setelah Phase 5 & 7)*
+- **Collections + access + seed (Phase 1, 2026-10-06):** schema products/leads/vouchers, roles admin/editor, seed konten dengan gambar digenerate SVG→PNG (edge: `&` harus di-escape di XML SVG — "HR & Payroll" membatalkan sharp). Akses diverifikasi via API anonim (leads/users 403, vouchers 200).
+- **Invariant kuota + API (Phase 4.2/5.3/7.1, 2026-10-06):** pure functions + 41 unit test — edge yang diuji: agregat lintas paket & durasi, stale kuota (melanggar = block, bukan auto-clamp), voucher nominal di-cap subtotal, percent di-floor, minSpend, harga float ditolak zod. Uji manual 7 cabang API termasuk 409 kuota dengan `violations` detail.
 
 ## 5. Bagian yang sengaja ditulis sendiri tanpa AI + alasan
 - **Keputusan bisnis & scope** — reframe "research vehicle, bukan lamaran" + pelepasan deadline, arah riset JEV (lead scoring · Real Jev API), Neon go-ahead, repo public, "jangan commit /docs" (→ handbook-workflow), kapan diskusi vs eksekusi. AI menyiapkan opsi + konsekuensi; pemutusan tetap manusia.
