@@ -44,3 +44,6 @@ dist/
 /docs/
 .vercel
 .env*
+
+# tsc incremental cache
+*.tsbuildinfo
