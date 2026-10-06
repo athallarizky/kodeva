@@ -16,6 +16,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
       payload.logger.info(`Revalidating page at path: ${path}`)
 
       revalidatePath(path)
+      revalidateTag('pages', 'max') // api-contract.md §6
       revalidateTag('pages-sitemap', 'max')
     }
 
@@ -26,6 +27,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
       revalidatePath(oldPath)
+      revalidateTag('pages', 'max')
       revalidateTag('pages-sitemap', 'max')
     }
   }
@@ -36,6 +38,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
   if (!context.disableRevalidate) {
     const path = doc?.slug === 'home' ? '/' : `/${doc?.slug}`
     revalidatePath(path)
+    revalidateTag('pages', 'max')
     revalidateTag('pages-sitemap', 'max')
   }
 

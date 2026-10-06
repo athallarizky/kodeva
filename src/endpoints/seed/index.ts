@@ -478,6 +478,109 @@ export const seed = async ({
     }),
   ])
 
+  payload.logger.info(`— Halaman home (blocks)...`)
+  const featuredIds = productDocs.filter((p) => p.featured).map((p) => p.id)
+  const heroImage = mediaBySlug.get('kodeva-kasir')
+  await payload.create({
+    collection: 'pages',
+    draft: false,
+    context: { disableRevalidate: true },
+    data: {
+      title: 'Kodeva — Software UMKM',
+      slug: 'home',
+      _status: 'published',
+      hero: { type: 'none' },
+      layout: [
+        {
+          blockType: 'banner',
+          style: 'info',
+          publishAt: new Date('2026-10-01T00:00:00+07:00').toISOString(),
+          content: root(
+            paragraph('Promo akhir tahun: lisensi mulai Rp149 ribu/bln — kuota terbatas per produk.'),
+          ),
+        },
+        {
+          blockType: 'hero',
+          kicker: 'Promo Akhir Tahun',
+          title: 'Software bisnis yang jalan dalam sehari',
+          subtitle:
+            'Aplikasi kasir, HR & payroll, dan add-on untuk UMKM Indonesia. Tanpa hardware khusus, tanpa kontrak panjang — bayar per lisensi per bulan.',
+          image: heroImage!.id,
+          primaryCta: { label: 'Lihat Produk', href: '/produk' },
+          secondaryCta: { label: 'Baca Blog', href: '/posts' },
+        },
+        {
+          blockType: 'featured-products',
+          title: 'Produk Unggulan',
+          products: featuredIds.length ? featuredIds : productDocs.slice(0, 2).map((p) => p.id),
+          showPrices: true,
+        },
+        {
+          blockType: 'testimonials',
+          title: 'Kata Mereka',
+          items: [
+            {
+              quote:
+                'Dulu tutup toko harus ngitung ulang sampai malam. Sekarang laporan sudah menunggu di HP sebelum saya pulang.',
+              name: 'Bu Sari',
+              role: 'Pemilik Warung Sari Rasa, Bandung',
+            },
+            {
+              quote:
+                'Stok kain tidak pernah bohong lagi. Notifikasi stok menipis menyelamatkan penjualan ramai akhir pekan.',
+              name: 'Dewi Lestari',
+              role: 'Pemilik Butik Ampik, Yogyakarta',
+            },
+            {
+              quote:
+                'Empat kasir, satu dasbor. Owner seperti saya akhirnya bisa libur tanpa takut omzet bocor.',
+              name: 'Rangga Pratama',
+              role: 'Pemilik Kafe Kopi Pagi, Bandung',
+            },
+          ],
+        },
+        {
+          blockType: 'faq',
+          title: 'Pertanyaan Umum',
+          items: [
+            {
+              question: 'Apa itu "lisensi" di Kodeva?',
+              answer:
+                'Satu lisensi berlaku untuk satu outlet (produk kasir) atau satu perusahaan (HR & Payroll), dipakai siapa pun di unit itu. Jumlah lisensi menentukan berapa unit paralel yang aktif.',
+            },
+            {
+              question: 'Bisakah upgrade paket Basic ke Pro kapan saja?',
+              answer:
+                'Bisa. Selisih harga dihitung proporsional dari sisa masa aktif; data dan konfigurasi tidak berubah sama sekali saat upgrade.',
+            },
+            {
+              question: 'Bagaimana kebijakan refund?',
+              answer:
+                'Garansi 14 hari uang kembali penuh untuk lisensi baru, tanpa perlu alasan. Cukup hubungi tim support dari menu bantuan.',
+            },
+            {
+              question: 'Kalau berhenti berlangganan, apa data saya hilang?',
+              answer:
+                'Tidak. Anda dapat mengunduh seluruh data (transaksi, karyawan, pelanggan) dalam format CSV/Excel kapan saja, bahkan setelah langganan berakhir.',
+            },
+            {
+              question: 'Apakah ada dukungan kalau kendala?',
+              answer:
+                'Semua paket mendapat dukungan via WhatsApp dan email pada jam kerja. Paket Business mendapat prioritas respons di bawah 2 jam.',
+            },
+          ],
+        },
+      ],
+      publishedAt: new Date().toISOString(),
+      meta: {
+        title: 'Kodeva — Aplikasi Kasir & HR untuk UMKM Indonesia',
+        description:
+          'Software UMKM: aplikasi kasir, HR & payroll, dan add-on. Mulai Rp149 ribu per lisensi per bulan. Promo akhir tahun — kuota terbatas.',
+        image: heroImage?.id,
+      },
+    },
+  })
+
   payload.logger.info(`— Header & footer...`)
   await Promise.all([
     payload.updateGlobal({

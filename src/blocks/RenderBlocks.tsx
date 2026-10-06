@@ -3,15 +3,25 @@ import React, { Fragment } from 'react'
 import type { Page } from '@/payload-types'
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
+import { FaqBlock } from '@/blocks/FAQ/Component'
+import { FeaturedProductsBlock } from '@/blocks/FeaturedProducts/Component'
+import { HeroBlock } from '@/blocks/Hero/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { TestimonialsBlock } from '@/blocks/Testimonials/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
+  banner: BannerBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
+  faq: FaqBlock,
+  'featured-products': FeaturedProductsBlock,
+  hero: HeroBlock,
   mediaBlock: MediaBlock,
+  testimonials: TestimonialsBlock,
 }
 
 export const RenderBlocks: React.FC<{

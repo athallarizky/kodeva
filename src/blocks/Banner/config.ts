@@ -32,6 +32,19 @@ export const Banner: Block = {
       label: false,
       required: true,
     },
+    // Promo terjadwal — kosongkan keduanya agar tampil selamanya
+    {
+      name: 'publishAt',
+      type: 'date',
+      label: 'Tayang Pada',
+      admin: { date: { pickerAppearance: 'dayAndTime' } },
+    },
+    {
+      name: 'unpublishAt',
+      type: 'date',
+      label: 'Berakhir Pada',
+      admin: { date: { pickerAppearance: 'dayAndTime' } },
+    },
   ],
   interfaceName: 'BannerBlock',
 }

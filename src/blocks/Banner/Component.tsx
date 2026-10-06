@@ -8,7 +8,12 @@ type Props = {
   className?: string
 } & BannerBlockProps
 
-export const BannerBlock: React.FC<Props> = ({ className, content, style }) => {
+export const BannerBlock: React.FC<Props> = ({ className, content, style, publishAt, unpublishAt }) => {
+  // Jadwal promo (opsional): hanya tampil dalam rentang publishAt..unpublishAt
+  const now = Date.now()
+  if (publishAt && new Date(publishAt).getTime() > now) return null
+  if (unpublishAt && new Date(unpublishAt).getTime() < now) return null
+
   return (
     <div className={cn('mx-auto my-8 w-full', className)}>
       <div
