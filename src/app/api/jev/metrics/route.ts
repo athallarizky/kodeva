@@ -9,8 +9,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { brier, ece, eceVsTrue, learningCurve, marginAnalysis, reliability } from '@/lib/jev/calibration'
 import { applyPlatt, plattSummary, type ScoredLeadRow } from '@/lib/jev/apply-platt'
 
+// DEV-ONLY: bypass auth untuk script lokal — identik dengan guard di /api/jev/run
+// (env flag saat start dev + bukan production + header khusus). Tertutup permanen di Vercel.
+function devBypassOk(req: NextRequest): boolean {
+  return (
+    process.env.ALLOW_LOCAL_RUN_BYPASS === '1' &&
+    process.env.NODE_ENV !== 'production' &&
+    req.headers.get('x-dev-bypass') === '1'
+  )
+}
+
 async function requireAdmin(req: NextRequest) {
   const payload = await getPayload({ config: configPromise })
+  if (devBypassOk(req)) return { payload, ok: true as const }
   const { user } = await payload.auth({ headers: req.headers })
   if (!user) return { payload, ok: false as const, status: 401, reason: 'unauthorized' }
   const roles = (user as { roles?: string[] | null }).roles

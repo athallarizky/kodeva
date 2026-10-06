@@ -12,14 +12,30 @@ export const maxDuration = 60
 
 const VALID_SCENARIOS: ScenarioId[] = ['baseline', 'drift-source', 'drift-price']
 
+// DEV-ONLY: bypass auth untuk runner script lokal (matriks P4 dijalankan dari CLI,
+// bukan browser). Aktif HANYA jika env flag dinyalakan SAAT start dev server
+// (ALLOW_LOCAL_RUN_BYPASS=1 npm run dev) dan NODE_ENV bukan production —
+// build Vercel selalu production → pintu ini tertutup permanen di sana.
+function devBypassOk(req: NextRequest): boolean {
+  return (
+    process.env.ALLOW_LOCAL_RUN_BYPASS === '1' &&
+    process.env.NODE_ENV !== 'production' &&
+    req.headers.get('x-dev-bypass') === '1'
+  )
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  // auth: hanya admin (roles kosong = bootstrap admin)
   const payload = await getPayload({ config: configPromise })
-  const { user } = await payload.auth({ headers: req.headers })
-  if (!user) return NextResponse.json({ ok: false, reason: 'unauthorized' }, { status: 401 })
-  const roles = (user as { roles?: string[] | null }).roles
-  if (!(roles === null || roles === undefined || roles.length === 0 || roles.includes('admin'))) {
-    return NextResponse.json({ ok: false, reason: 'forbidden' }, { status: 403 })
+  if (devBypassOk(req)) {
+    // jalur runner lokal — lanjut tanpa sesi admin
+  } else {
+    // auth: hanya admin (roles kosong = bootstrap admin)
+    const { user } = await payload.auth({ headers: req.headers })
+    if (!user) return NextResponse.json({ ok: false, reason: 'unauthorized' }, { status: 401 })
+    const roles = (user as { roles?: string[] | null }).roles
+    if (!(roles === null || roles === undefined || roles.length === 0 || roles.includes('admin'))) {
+      return NextResponse.json({ ok: false, reason: 'forbidden' }, { status: 403 })
+    }
   }
 
   let body: { scenario?: string; n?: number; engine?: string; salt?: number }

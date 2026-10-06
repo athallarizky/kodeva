@@ -81,6 +81,12 @@ Format per entry: apa yang AI hasilkan → bagaimana ketahuan → cara perbaiki 
 **Cara perbaiki:** (masuk P4, tercatat di handbook) pisahkan fit per-engine — `applyPlatt` dipanggil dengan filter `model`, UI satu tombol per engine.
 **Verifikasi akhir:** Belum diverifikasi — sengaja dicatat terbuka di sini dan di daftar kerja P4, bukan didiamkan.
 
+### 3.11 — Runner background memakai $RANDOM zsh yang mengevaluasi konstan (2026-10-06, sprint-2 P4)
+**Apa yang AI hasilkan:** Script runner matrix (`zsh` + curl loop) men-generate salt per batch dengan `$((RANDOM % 10000))` di dalam command substitution, berasumsi tiap iterasi menghasilkan angka baru.
+**Bagaimana ketahuan:** Script cek matrix menunjukkan semua 11 batch tercatat salt=7940 — semua panggilan memakai salt identik. Konsekuensi: tiap skenario me-regenerasi lead yang SAMA berkali-kali (generator deterministik dari seed) — 1.590 baris ternyata hanya 770 lead unik. Terdeteksi dari anomali tabel batch, bukan dari output runner (runner melaporkan "scoredOk:100" seolah sehat — pseudo-replikasi tak terlihat dari metrik per-run).
+**Cara perbaiki:** (1) dedup DB: sisakan id terkecil per (skenario, seed) — 820 baris duplikat dihapus; (2) runner ulang dengan salt EKSPLISIT berurutan (8001, 8002, …) yang mustahil tabrakan; (3) tambah script `check-dupes` sebagai gerbang verifikasi sebelum analisis.
+**Verifikasi akhir:** setelah top-up, `check-dupes` = nol duplikat dan hitungan unik ≥500/skenario; kesimpulan riset hanya diambil dari data terverifikasi unik.
+
 ## 4. Implementasi yang banyak dibantu AI + edge case yang diuji
 - **Scaffold & wiring (sprint-1 Phase 0.1, 2026-10-06):** merge template resmi + swap adapter postgres + resolusi dependency (dedupe tsx). Edge yang diuji: boot `next dev` (lulus), perintah CLI payload standalone (gagal → RCA + bypass strategis), 3 varian undici × 2 versi Node (gagal konsisten — memuluskan isolasi penyebab ke loader, bukan versi).
 - **Collections + access + seed (Phase 1, 2026-10-06):** schema products/leads/vouchers, roles admin/editor, seed konten dengan gambar digenerate SVG→PNG (edge: `&` harus di-escape di XML SVG — "HR & Payroll" membatalkan sharp). Akses diverifikasi via API anonim (leads/users 403, vouchers 200).
