@@ -4,6 +4,8 @@ import { PartyPopper, X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
+import { trackLandingCtaClick } from '@/lib/tracking'
+
 const DISMISS_KEY = 'kodeva-promo-dismissed'
 
 /** Banner promo atas (desain landing) — bisa ditutup, ingat penutupan sesi ini. */
@@ -27,6 +29,7 @@ export const PromoBanner: React.FC = () => {
         <Link
           href="/produk"
           className="text-[11.5px] font-bold text-tint-3 underline underline-offset-2 hover:text-white transition-colors"
+          onClick={() => trackLandingCtaClick('Lihat Diskon', 'banner')}
         >
           Lihat Diskon →
         </Link>
