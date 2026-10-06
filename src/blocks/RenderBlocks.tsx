@@ -13,6 +13,8 @@ import { LeadFormBlock } from '@/blocks/LeadForm/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { TestimonialsBlock } from '@/blocks/Testimonials/Component'
 
+import { cn } from '@/utilities/ui'
+
 const blockComponents = {
   archive: ArchiveBlock,
   banner: BannerBlock,
@@ -43,8 +45,13 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
+              const spacingClass =
+                blockType === 'banner'
+                  ? 'my-4 md:my-6 first:mt-0'
+                  : 'my-12 md:my-16 first:mt-2'
+
               return (
-                <div className="my-16" key={index}>
+                <div className={cn(spacingClass)} key={index}>
                   {/* @ts-expect-error there may be some mismatch between the expected types here */}
                   <Block {...block} disableInnerContainer />
                 </div>

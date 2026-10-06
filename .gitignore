@@ -38,6 +38,8 @@ dist/
 .aider/
 .gemini/
 .opencode/
+.agents/
+skills-lock.json
 
 # Planning & learning docs — private, synced to engineering-handbook
 /docs
