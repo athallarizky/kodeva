@@ -45,6 +45,16 @@ const CAT_LABEL: Record<ProductDTO['category'], string> = {
   addon: 'Add-on',
 }
 
+// Mock screenshot dasbor per produk (1200×750 = aspect 16/10); fallback foto POS generik
+const MOCK_SCREENSHOT: Record<string, string> = {
+  'kodeva-kasir': '/images/mock-kodeva-kasir.png',
+  'kodeva-hr-payroll': '/images/mock-kodeva-hr-payroll.png',
+  'kodeva-invoice-pro': '/images/mock-kodeva-invoice-pro.png',
+  'kodeva-backup-cloud': '/images/mock-kodeva-backup-cloud.png',
+  'kodeva-wa-notifier': '/images/mock-kodeva-wa-notifier.png',
+  'kodeva-e-faktur': '/images/mock-kodeva-e-faktur.png',
+}
+
 export const ProductDetail: React.FC<{ product: ProductDTO; quotaIndex: QuotaIndex }> = ({
   product,
   quotaIndex,
@@ -160,8 +170,8 @@ export const ProductDetail: React.FC<{ product: ProductDTO; quotaIndex: QuotaInd
             {/* Gallery / Hero Preview */}
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-line/70 shadow-card bg-gradient-to-br from-tint/90 to-tint-2/40">
               <Image
-                src="/images/pos-terminal.jpg"
-                alt={`${product.name} — tampilan aplikasi`}
+                src={MOCK_SCREENSHOT[product.slug] ?? '/images/pos-terminal.jpg'}
+                alt={`Pratinjau dasbor ${product.name}`}
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 680px"

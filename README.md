@@ -2,7 +2,7 @@
 
 > Take-home test **PT Digital Solusi Grup (DSG)** — Fullstack Developer — yang di-reframe menjadi **research vehicle**: implementasi hidup di production sebagai wadah pengukuran riset kalibrasi lead-scoring (JEV). Brand **"Kodeva"** fiktif: aplikasi kasir, HR & payroll, dan add-on dengan lisensi berlangganan.
 
-**Production:** https://kodeva-ochre.vercel.app · **Admin CMS:** `/admin` · **Repo:** public, commit history tanpa squash (per-sprint, conventional, signed).
+**Production:** https://kodeva.athallarizky.com · **Admin CMS:** `/admin` · **Repo:** public, commit history tanpa squash (per-sprint, conventional, signed).
 
 ## Status — 4 sprint, semua CLOSED
 
