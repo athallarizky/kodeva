@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
+import { isAdmin } from '../../access/isAdmin'
 import { anyone } from '../../access/anyone'
 
 import { revalidateVoucher } from './hooks/revalidateVoucher'
@@ -10,10 +10,10 @@ import { revalidateVoucher } from './hooks/revalidateVoucher'
 export const Vouchers: CollectionConfig<'vouchers'> = {
   slug: 'vouchers',
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: isAdmin,
+    delete: isAdmin,
     read: anyone, // checkout perlu membaca kode voucher valid/tidak (validasi nilai tetap di server)
-    update: authenticated,
+    update: isAdmin,
   },
   admin: {
     defaultColumns: ['code', 'discountType', 'discountValue', 'active', 'expiresAt'],

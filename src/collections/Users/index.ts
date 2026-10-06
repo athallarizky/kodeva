@@ -1,18 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
+import { isAdmin } from '../../access/isAdmin'
 
-export const Users: CollectionConfig = {
+export const Users: CollectionConfig<'users'> = {
   slug: 'users',
   access: {
     admin: authenticated,
-    create: authenticated,
-    delete: authenticated,
-    read: authenticated,
-    update: authenticated,
+    // registerFirstUser (first-run) melewati access create — user pertama tetap bisa dibuat
+    create: isAdmin,
+    delete: isAdmin,
+    read: isAdmin,
+    update: isAdmin,
   },
   admin: {
-    defaultColumns: ['name', 'email'],
+    defaultColumns: ['name', 'email', 'roles'],
     useAsTitle: 'name',
   },
   auth: true,
@@ -20,6 +22,22 @@ export const Users: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
+      label: 'Nama',
+    },
+    {
+      name: 'roles',
+      type: 'select',
+      hasMany: true,
+      defaultValue: ['admin'],
+      required: true,
+      label: 'Peran',
+      options: [
+        { label: 'Admin — akses penuh', value: 'admin' },
+        { label: 'Editor — konten & leads', value: 'editor' },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
     },
   ],
   timestamps: true,

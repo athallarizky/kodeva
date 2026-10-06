@@ -1,19 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../../access/anyone'
-import { authenticated } from '../../access/authenticated'
+import { isAdmin } from '../../access/isAdmin'
+import { adminOrEditor } from '../../access/adminOrEditor'
 
 // Skema: docs/sprint-0/resources/data-design.md §1.5 (FINAL)
 // Form lead capture (Bagian A) + instrumen riset JEV (sprint-2).
 // create = publik HANYA via /api/leads (route yang menulis field-field ini,
-// bukan form admin); read/update/delete = login.
+// bukan form admin); read = admin+editor (marketing); update/delete = admin.
 export const Leads: CollectionConfig<'leads'> = {
   slug: 'leads',
   access: {
     create: anyone,
-    delete: authenticated,
-    read: authenticated,
-    update: authenticated,
+    delete: isAdmin,
+    read: adminOrEditor,
+    update: isAdmin,
   },
   admin: {
     defaultColumns: ['name', 'contact', 'jev.p', 'createdAt'],
