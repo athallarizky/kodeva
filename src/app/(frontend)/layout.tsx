@@ -2,14 +2,21 @@ import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
 import { Funnel_Sans, Inter } from 'next/font/google'
+import dynamic from 'next/dynamic'
 import React from 'react'
 
-import { AdminBar } from '@/components/AdminBar'
 import { BottomNav } from '@/components/kit/BottomNav'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { TrackingDrawer } from '@/components/TrackingDrawer'
 import { UtmCapture } from '@/components/UtmCapture'
+
+// AdminBar hanya untuk sesi draft-preview — lazy supaya JS admin-bar
+// tidak ikut dibebankan pengunjung publik (Lighthouse sprint-3).
+const AdminBar = dynamic(
+  () => import('@/components/AdminBar').then((m) => ({ default: m.AdminBar })),
+  { ssr: false },
+)
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -54,11 +61,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="bg-page font-sans text-forest antialiased">
         <Providers>
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          />
+          {isEnabled ? (
+            <AdminBar
+              adminBarProps={{
+                preview: isEnabled,
+              }}
+            />
+          ) : null}
 
           <UtmCapture />
           <Header />
