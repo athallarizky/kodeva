@@ -26,6 +26,19 @@ export function buildLeadFeatures(lead: {
   }
 }
 
+export type PriorityTier = 'panas' | 'hangat' | 'dingin'
+
+/**
+ * Tier prioritas utk marketing — dari skor efektif (pPlatt bila sudah dipasang,
+ * else p mentah). Pita dikalibrasi ke dunia kodeva (mean pTrue ~0.15, skor
+ * terkoreksi max ~0.27): panas = ~top 10%, hangat = di atas rata-rata.
+ */
+export function priorityTier(effectiveScore: number): PriorityTier {
+  if (effectiveScore >= 0.25) return 'panas'
+  if (effectiveScore >= 0.15) return 'hangat'
+  return 'dingin'
+}
+
 export interface ScoreResult {
   ok: boolean
   decision?: JevDecision

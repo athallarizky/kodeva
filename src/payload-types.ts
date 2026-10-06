@@ -355,6 +355,7 @@ export interface Lead {
   id: number;
   name: string;
   contact: string;
+  priority?: ('panas' | 'hangat' | 'dingin') | null;
   utm?: {
     source?: string | null;
     medium?: string | null;
@@ -482,6 +483,7 @@ export interface ProductsSelect<T extends boolean = true> {
 export interface LeadsSelect<T extends boolean = true> {
   name?: T;
   contact?: T;
+  priority?: T;
   utm?:
     | T
     | {

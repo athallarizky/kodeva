@@ -17,10 +17,10 @@ export const Leads: CollectionConfig<'leads'> = {
     update: isAdmin,
   },
   admin: {
-    defaultColumns: ['name', 'contact', 'jev.p', 'createdAt'],
+    defaultColumns: ['name', 'contact', 'priority', 'jev.p', 'createdAt'],
     useAsTitle: 'name',
     description:
-      'Prospect dari form landing page. Skor JEV diisi otomatis (riset) — urutkan kolom Skor untuk prioritas.',
+      'Prospect dari form landing page. Skor = perkiraan minat, BUKAN jaminan — hubungi urutan atas lebih dulu; skor rendah tetap layak dihubungi, cuma belakangan.',
   },
   fields: [
     {
@@ -36,6 +36,21 @@ export const Leads: CollectionConfig<'leads'> = {
       label: 'Email / WhatsApp',
       admin: {
         description: 'Diisi pengunjung — divalidasi server (email aktif ATAU nomor WA Indonesia)',
+      },
+    },
+    {
+      // dihitung otomatis dari skor (pPlatt bila ada, else p) — untuk urutan follow-up marketing
+      name: 'priority',
+      type: 'select',
+      label: 'Prioritas',
+      options: [
+        { label: '🔥 Panas — hubungi hari ini', value: 'panas' },
+        { label: '🌤️ Hangat — 1–3 hari', value: 'hangat' },
+        { label: '❄️ Dingin — minggu ini', value: 'dingin' },
+      ],
+      admin: {
+        readOnly: true,
+        description: 'Diisi otomatis dari skor. Urutan daftar mengikuti kolom ini.',
       },
     },
     {

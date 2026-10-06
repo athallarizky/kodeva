@@ -5,6 +5,7 @@ import configPromise from '@payload-config'
 import { getPayload, PayloadRequest, type Where } from 'payload'
 
 import { ece, eceVsTrue, plattApply, plattFit, type PlattParams } from './calibration'
+import { priorityTier } from './score-lead'
 
 export interface PlattSummary {
   n: number
@@ -69,13 +70,16 @@ export async function applyPlatt(
 
   for (const doc of found.docs) {
     if (typeof doc.jev?.p !== 'number') continue
+    const pPlatt = plattApply(doc.jev.p, summary.params)
     await payload.update({
       collection: 'leads',
       id: doc.id,
       data: {
+        // re-tier dari skor terkoreksi Platt
+        priority: priorityTier(pPlatt),
         jev: {
           ...doc.jev,
-          pPlatt: plattApply(doc.jev.p, summary.params),
+          pPlatt,
         },
       },
       req: { context: {} } as PayloadRequest,

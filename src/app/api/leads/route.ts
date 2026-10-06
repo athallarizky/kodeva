@@ -51,7 +51,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // 4) Skor JEV — advisory (gagal TIDAK menggagalkan lead; sprint-2 live pipeline)
   try {
     const { RealJevClient } = await import('@/lib/jev/client')
-    const { buildLeadFeatures, jevUpdatePayload, scoreLead } = await import('@/lib/jev/score-lead')
+    const { buildLeadFeatures, jevUpdatePayload, priorityTier, scoreLead } = await import('@/lib/jev/score-lead')
     const features = buildLeadFeatures({
       utm: input.utm ?? {},
       landingPath: input.landingPath,
@@ -63,6 +63,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const result = await scoreLead(features, new RealJevClient())
     const update = jevUpdatePayload(result, 'live')
     ;(update.jev as Record<string, unknown>).input = features
+    if (result.ok && result.decision) {
+      ;(update as Record<string, unknown>).priority = priorityTier(result.decision.p)
+    }
     await payload.update({
       collection: 'leads',
       id: lead.id,
