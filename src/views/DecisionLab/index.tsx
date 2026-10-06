@@ -97,6 +97,7 @@ export const DecisionLabView: React.FC = () => {
   const [queue, setQueue] = useState<QueueRow[]>([])
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [batchN, setBatchN] = useState(100) // ukuran batch real per klik (pagar route: ≤200)
 
   const refresh = useCallback(async () => {
     const r = await fetch('/api/jev/metrics', { cache: 'no-store' })
@@ -114,14 +115,14 @@ export const DecisionLabView: React.FC = () => {
     void refresh()
   }, [refresh])
 
-  const runExperiment = async (scenario: string, engine: 'mock' | 'real', n: number) => {
+  const runExperiment = async (scenario: string, engine: 'mock' | 'real', n: number, salt?: number) => {
     setBusy(`${engine}:${scenario}`)
     setMessage(`Menjalankan ${engine} ${scenario} n=${n}… (n besar = tunggu lama)`)
     try {
       const r = await fetch('/api/jev/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, n, engine }),
+        body: JSON.stringify(salt !== undefined ? { scenario, n, engine, salt } : { scenario, n, engine }),
       })
       const j = await r.json()
       if (j.ok) {
@@ -180,10 +181,24 @@ export const DecisionLabView: React.FC = () => {
           <button disabled={busy !== null} onClick={() => runExperiment('baseline', 'mock', 100)}>Mock baseline n=100 (gratis)</button>
           <button disabled={busy !== null} onClick={() => runExperiment('drift-source', 'mock', 100)}>Mock drift-source n=100</button>
           <button disabled={busy !== null} onClick={() => runExperiment('drift-price', 'mock', 100)}>Mock drift-price n=100</button>
-          <button disabled={busy !== null} onClick={() => runExperiment('baseline', 'real', 20)}>Real baseline n=20 (PAYG)</button>
-          <button disabled={busy !== null} onClick={() => runExperiment('drift-source', 'real', 20)}>Real drift-source n=20 (PAYG)</button>
-          <button disabled={busy !== null} onClick={() => runExperiment('drift-price', 'real', 20)}>Real drift-price n=20 (PAYG)</button>
+          <button disabled={busy !== null} onClick={() => runExperiment('baseline', 'real', batchN, Math.floor(Math.random() * 1000))}>Real baseline n={batchN} (PAYG)</button>
+          <button disabled={busy !== null} onClick={() => runExperiment('drift-source', 'real', batchN, Math.floor(Math.random() * 1000))}>Real drift-source n={batchN} (PAYG)</button>
+          <button disabled={busy !== null} onClick={() => runExperiment('drift-price', 'real', batchN, Math.floor(Math.random() * 1000))}>Real drift-price n={batchN} (PAYG)</button>
+          <label style={{ fontSize: 12, alignSelf: 'center' }}>
+            n/klik (≤200):{' '}
+            <input
+              type="number"
+              min={1}
+              max={200}
+              value={batchN}
+              onChange={(e) => setBatchN(Math.max(1, Math.min(200, Math.floor(Number(e.target.value) || 1))))}
+              style={{ width: 56 }}
+            />
+          </label>
         </div>
+        <p style={{ marginTop: 8, fontSize: 11, color: '#999' }}>
+          Tiap klik real memakai salt acak → lead selalu segar (klik ulang ≠ duplikat). Target matriks penuh 3×500 = 15 klik n=100.
+        </p>
         {models.length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
             {models.map((m) => (

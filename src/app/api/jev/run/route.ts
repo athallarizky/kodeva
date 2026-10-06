@@ -1,11 +1,14 @@
 // POST /api/jev/run — trigger eksperimen (ADMIN ONLY).
 // Pagar: n ≤ 200/request (biaya PAYG + waktu); runner internal ≤ 1000.
+// maxDuration 60s: batch real n=100 ≈ 30–40s (PAYG ~300ms/lead + 2× DB write).
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { runExperiment } from '@/lib/jev/run'
 import type { ScenarioId } from '@/lib/jev/types'
+
+export const maxDuration = 60
 
 const VALID_SCENARIOS: ScenarioId[] = ['baseline', 'drift-source', 'drift-price']
 
@@ -19,7 +22,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, reason: 'forbidden' }, { status: 403 })
   }
 
-  let body: { scenario?: string; n?: number; engine?: string }
+  let body: { scenario?: string; n?: number; engine?: string; salt?: number }
   try {
     body = await req.json()
   } catch {
@@ -32,7 +35,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
   const engine = body.engine === 'real' ? 'real' : 'mock'
   const n = Math.max(1, Math.min(200, Math.floor(body.n ?? 100)))
+  const salt = Number.isFinite(body.salt) ? Math.max(0, Math.min(9_999, Math.floor(body.salt as number))) : 0
 
-  const result = await runExperiment({ scenario, n, engine })
+  const result = await runExperiment({ scenario, n, engine, salt })
   return NextResponse.json({ ok: true, result })
 }

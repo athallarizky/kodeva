@@ -17,6 +17,10 @@ export interface RunSpec {
   n: number
   engine: 'mock' | 'real'
   seedBase?: number
+  /** pembeda antar-klik: seedBase += salt·1e9 → tiap klik menghasilkan lead SEGAR
+   *  (tanpa ini, klik ulang n sama meregenerasi lead identik sebagai duplikat).
+   *  Mock tidak memakai salt agar tetap deterministik/reproducible. */
+  salt?: number
 }
 
 export interface RunResult {
@@ -53,7 +57,9 @@ export function makeClient(engine: 'mock' | 'real'): JevClient {
 export async function runExperiment(spec: RunSpec): Promise<RunResult> {
   const scenario = getScenario(spec.scenario)
   const n = Math.min(spec.n, scenario.n, MAX_N_PER_RUN)
-  const seedBase = spec.seedBase ?? hashSeed(spec.scenario, n)
+  // salt hanya relevan saat seedBase tidak dipin eksplisit; jarak antar-salt 1e9 ≫ rentang seed satu batch (n·7919 ≤ 7.9e6)
+  const seedBase =
+    spec.seedBase ?? hashSeed(spec.scenario, n) + (spec.engine === 'real' ? (spec.salt ?? 0) * 1_000_000_000 : 0)
   const client = makeClient(spec.engine)
   const payload = await getPayload({ config: configPromise })
 
