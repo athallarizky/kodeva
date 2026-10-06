@@ -12,16 +12,45 @@ interface ReliabilityPoint {
   observedRate: number | null
 }
 
+interface LearningCurvePoint {
+  n: number
+  eceBefore: number
+  eceAfter: number
+}
+
+interface MarginQuartile {
+  n: number
+  meanMargin: number
+  meanAbsErrOutcome: number
+  meanAbsErrTrue: number | null
+}
+
+interface MarginAnalysis {
+  n: number
+  spearmanVsAbsErrOutcome: number
+  spearmanVsAbsErrTrue: number | null
+  quartiles: MarginQuartile[]
+}
+
 interface ScenarioMetrics {
   scenario: string
   model: string
   n: number
-  ece: number
+  nOutcome?: number
+  ece: number | null
   eceTrue: number | null
-  brier: number
+  brier: number | null
   reliability: ReliabilityPoint[]
   latencyP50Ms: number
   latencyP95Ms: number
+  platt: { n: number; params: { a: number; b: number }; eceBefore: number; eceAfter: number } | null
+  learningCurve?: LearningCurvePoint[]
+  margin?: MarginAnalysis | null
+}
+
+interface ModelSummary {
+  model: string
+  n: number
   platt: { n: number; params: { a: number; b: number }; eceBefore: number; eceAfter: number } | null
 }
 
@@ -64,6 +93,7 @@ function ReliabilityChart({ points }: { points: ReliabilityPoint[] }) {
 
 export const DecisionLabView: React.FC = () => {
   const [scenarios, setScenarios] = useState<ScenarioMetrics[]>([])
+  const [models, setModels] = useState<ModelSummary[]>([])
   const [queue, setQueue] = useState<QueueRow[]>([])
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -73,6 +103,7 @@ export const DecisionLabView: React.FC = () => {
     const j = await r.json()
     if (j.ok) {
       setScenarios(j.scenarios)
+      setModels(j.models ?? [])
       setQueue(j.queue)
     } else {
       setMessage(`Gagal memuat metrik: ${j.reason}`)
@@ -107,20 +138,21 @@ export const DecisionLabView: React.FC = () => {
     }
   }
 
-  const applyPlatt = async () => {
-    setBusy('platt')
-    setMessage('Memasang Platt wrapper (fit + tulis pPlatt)…')
+  // Platt PER ENGINE — engine mock & real punya bias berbeda, tidak boleh dicampur (fix 3.10)
+  const applyPlattFor = async (model: string) => {
+    setBusy(`platt:${model}`)
+    setMessage(`Memasang Platt wrapper untuk ${model} (fit + tulis pPlatt)…`)
     try {
       const r = await fetch('/api/jev/metrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ model }),
       })
       const j = await r.json()
       setMessage(
         j.ok
-          ? `Platt: n=${j.summary.n}, a=${fmt(j.summary.params.a)}, b=${fmt(j.summary.params.b)} — ECE ${fmt(j.summary.eceBefore)} → ${fmt(j.summary.eceAfter)}`
-          : `Platt gagal: ${j.reason} (butuh ≥10 lead ter-skor)`,
+          ? `Platt [${model}]: n=${j.summary.n}, a=${fmt(j.summary.params.a)}, b=${fmt(j.summary.params.b)} — ECE ${fmt(j.summary.eceBefore)} → ${fmt(j.summary.eceAfter)}`
+          : `Platt [${model}] gagal: ${j.reason} (butuh ≥10 lead ter-skor dengan outcome)`,
       )
       await refresh()
     } finally {
@@ -151,8 +183,16 @@ export const DecisionLabView: React.FC = () => {
           <button disabled={busy !== null} onClick={() => runExperiment('baseline', 'real', 20)}>Real baseline n=20 (PAYG)</button>
           <button disabled={busy !== null} onClick={() => runExperiment('drift-source', 'real', 20)}>Real drift-source n=20 (PAYG)</button>
           <button disabled={busy !== null} onClick={() => runExperiment('drift-price', 'real', 20)}>Real drift-price n=20 (PAYG)</button>
-          <button disabled={busy !== null} onClick={applyPlatt}>⚡ Pasang Platt wrapper</button>
         </div>
+        {models.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+            {models.map((m) => (
+              <button key={m.model} disabled={busy !== null} onClick={() => applyPlattFor(m.model)}>
+                ⚡ Platt → {m.model} (fit n={m.platt?.n ?? 0})
+              </button>
+            ))}
+          </div>
+        )}
         {message && <p style={{ marginTop: 10, fontSize: 13, color: '#333' }}>{message}</p>}
       </div>
 
@@ -162,7 +202,9 @@ export const DecisionLabView: React.FC = () => {
             <strong>
               {s.scenario} · {s.model}
             </strong>
-            <span style={{ fontSize: 12, color: '#666' }}>n={s.n} · latency p50/p95: {s.latencyP50Ms}/{s.latencyP95Ms} ms</span>
+            <span style={{ fontSize: 12, color: '#666' }}>
+              n={s.n}{typeof s.nOutcome === 'number' ? ` (outcome diketahui: ${s.nOutcome})` : ''} · latency p50/p95: {s.latencyP50Ms}/{s.latencyP95Ms} ms
+            </span>
           </div>
           <div style={{ display: 'flex', gap: 24, marginTop: 10, flexWrap: 'wrap' }}>
             <div>
@@ -173,6 +215,18 @@ export const DecisionLabView: React.FC = () => {
                 <div style={{ marginTop: 8, fontSize: 13, color: '#333' }}>
                   Platt (n={s.platt.n}): ECE {fmt(s.platt.eceBefore)} → <strong>{fmt(s.platt.eceAfter)}</strong>{' '}
                   (a={fmt(s.platt.params.a)}, b={fmt(s.platt.params.b)})
+                </div>
+              )}
+              {s.learningCurve && s.learningCurve.length > 0 && (
+                <div style={{ marginTop: 8, fontSize: 12, color: '#333' }}>
+                  RQ2 learning curve (train n → ECE test sebelum→sesudah):{' '}
+                  {s.learningCurve.map((c) => `${c.n}: ${fmt(c.eceBefore)}→${fmt(c.eceAfter)}`).join(' · ')}
+                </div>
+              )}
+              {s.margin && (
+                <div style={{ marginTop: 4, fontSize: 12, color: '#333' }}>
+                  RQ3 margin (n={s.margin.n}): ρ(err-outcome)={fmt(s.margin.spearmanVsAbsErrOutcome)} · ρ(err-true)={fmt(s.margin.spearmanVsAbsErrTrue)} · |err-true| per kuartil margin Q1→Q4:{' '}
+                  {s.margin.quartiles.map((q) => fmt(q.meanAbsErrTrue)).join(' / ')}
                 </div>
               )}
             </div>

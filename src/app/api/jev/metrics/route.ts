@@ -1,11 +1,12 @@
-// GET  /api/jev/metrics — metrik per (scenario × model) + antrian lead + preview Platt
-// POST /api/jev/metrics — action apply-platt (fit + tulis pPlatt)
+// GET  /api/jev/metrics — metrik per (scenario × model) + ringkasan per model (Platt per-engine)
+//        + antrian lead + learning curve (RQ2) + analisis margin (RQ3)
+// POST /api/jev/metrics — action apply-platt (fit + tulis pPlatt); kirim { model } untuk per-engine
 // ADMIN ONLY. Gratis: membaca DB, tanpa panggilan API Jev.
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { brier, ece, eceVsTrue, reliability } from '@/lib/jev/calibration'
+import { brier, ece, eceVsTrue, learningCurve, marginAnalysis, reliability } from '@/lib/jev/calibration'
 import { applyPlatt, plattSummary, type ScoredLeadRow } from '@/lib/jev/apply-platt'
 
 async function requireAdmin(req: NextRequest) {
@@ -44,10 +45,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       p: d.jev?.p ?? NaN,
       pTrue: typeof d.jev?.pTrue === 'number' ? d.jev.pTrue : null,
       converted: d.outcome?.converted ?? null,
+      margin: typeof d.jev?.margin === 'number' ? d.jev.margin : null,
     }))
-    const ps = rows.map((r) => r.p).filter((p) => Number.isFinite(p))
-    const ys = rows.map((r) => (r.converted ? 1 : 0))
-    const pTrues = rows.filter((r) => r.pTrue !== null).map((r) => r.pTrue as number)
+    // metrik vs outcome hanya dari lead dengan outcome diketahui (lead live belum punya —
+    // memaksakan y=0 akan menggelembungkan "ke Confidence" secara palsu)
+    const known = rows.filter((r) => Number.isFinite(r.p) && r.converted !== null)
+    const ps = known.map((r) => r.p)
+    const ys = known.map((r) => (r.converted ? 1 : 0))
+    const truePairs = rows.filter((r) => Number.isFinite(r.p) && typeof r.pTrue === 'number')
+    // RQ2: learning curve Platt — train n pertama, test di sisa (≥50 agar ECE test bermakna)
+    const lcSizes = [25, 50, 100, 250, 500].filter((s) => known.length - s >= 50)
+    const curve = lcSizes.length ? learningCurve(ps, ys, lcSizes) : []
     const latencies = docs
       .map((d) => d.jev?.latencyMs ?? 0)
       .filter((x): x is number => typeof x === 'number')
@@ -59,15 +67,37 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       scenario,
       model,
       n: docs.length,
-      ece: ece(ps, ys),
-      eceTrue: pTrues.length === ps.length && pTrues.length ? eceVsTrue(ps, pTrues) : null,
-      brier: brier(ps, ys),
+      nOutcome: known.length,
+      ece: ps.length ? ece(ps, ys) : null,
+      eceTrue: truePairs.length ? eceVsTrue(truePairs.map((r) => r.p), truePairs.map((r) => r.pTrue as number)) : null,
+      brier: ps.length ? brier(ps, ys) : null,
       reliability: reliability(ps, ys),
       latencyP50Ms: pct(50),
       latencyP95Ms: pct(95),
       platt: plattSummary(rows),
+      learningCurve: curve,
+      margin: marginAnalysis(rows),
     }
   })
+
+  // ringkasan per ENGINE (model) — dasar tombol "Platt per engine".
+  // Fix 3.10: engine mock & real punya bias berbeda — tidak boleh difit dalam satu kurva.
+  const byModel = new Map<string, ScoredLeadRow[]>()
+  for (const doc of scored.docs) {
+    const model = doc.jev?.model
+    if (!model) continue
+    if (!byModel.has(model)) byModel.set(model, [])
+    byModel.get(model)!.push({
+      p: doc.jev?.p ?? NaN,
+      pTrue: typeof doc.jev?.pTrue === 'number' ? doc.jev.pTrue : null,
+      converted: doc.outcome?.converted ?? null,
+    })
+  }
+  const models = [...byModel.entries()].map(([model, mRows]) => ({
+    model,
+    n: mRows.length,
+    platt: plattSummary(mRows),
+  }))
 
   // antrian prioritas: 20 teratas by p
   const queue = scored.docs.slice(0, 20).map((d) => ({
@@ -84,7 +114,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     createdAt: d.createdAt,
   }))
 
-  return NextResponse.json({ ok: true, scenarios, queue })
+  return NextResponse.json({ ok: true, scenarios, models, queue })
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {

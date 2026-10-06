@@ -1,7 +1,7 @@
 // Test matematika kalibrasi — golden values + positive control (schema.md §7).
 import { describe, expect, it } from 'vitest'
 
-import { brier, ece, eceVsTrue, learningCurve, plattApply, plattFit, reliability, spearman } from '@/lib/jev/calibration'
+import { brier, ece, eceVsTrue, learningCurve, marginAnalysis, plattApply, plattFit, reliability, spearman } from '@/lib/jev/calibration'
 import { generateBatch, mulberry32 } from '@/lib/jev/generator'
 import { SCENARIOS } from '@/lib/jev/scenarios'
 import { MockJevClient } from '@/lib/jev/client'
@@ -100,5 +100,59 @@ describe('learningCurve & spearman', () => {
   it('mulberry32 import path dipakai learningCurve (shuffle seeded deterministik)', () => {
     const rng = mulberry32(5)
     expect(typeof rng()).toBe('number')
+  })
+})
+
+describe('marginAnalysis (RQ3)', () => {
+  it('null bila < 8 baris atau margin tidak ada', () => {
+    expect(marginAnalysis([])).toBeNull()
+    const few = Array.from({ length: 5 }, (_, i) => ({
+      p: 0.3 + i * 0.05,
+      margin: 0.5,
+      converted: true,
+      pTrue: 0.3,
+    }))
+    expect(marginAnalysis(few)).toBeNull()
+    const noMargin = Array.from({ length: 20 }, () => ({
+      p: 0.4,
+      margin: null,
+      converted: true,
+      pTrue: 0.4,
+    }))
+    expect(marginAnalysis(noMargin)).toBeNull()
+  })
+
+  it('konstruksi tangan: margin tinggi ↔ error kecil → kuartil Q4 paling akurat, korelasi negatif', () => {
+    // 16 lead: margin naik, |p − pTrue| menurun seragam
+    const rows = Array.from({ length: 16 }, (_, i) => {
+      const margin = 0.1 + i * 0.05 // 0.10 … 0.85
+      const err = 0.4 - i * 0.024 // 0.40 … 0.04 menurun
+      const pTrue = 0.5
+      return {
+        p: Number((pTrue + (i % 2 === 0 ? err : -err)).toFixed(4)), // jitter arah, |err| tetap
+        margin,
+        converted: i % 4 === 0, // outcome tak dipakai kuartil-true
+        pTrue,
+      }
+    })
+    const m = marginAnalysis(rows)!
+    expect(m).not.toBeNull()
+    expect(m.n).toBe(16)
+    expect(m.quartiles).toHaveLength(4)
+    // ρ(margin, |p−pTrue|) harus −1 sempurna (relasi deterministik menurun)
+    expect(m.spearmanVsAbsErrTrue).toBeCloseTo(-1, 10)
+    // |err-true| kuartil Q1 (margin rendah) > Q4 (margin tinggi)
+    expect(m.quartiles[0].meanAbsErrTrue!).toBeGreaterThan(m.quartiles[3].meanAbsErrTrue!)
+  })
+
+  it('lead live (converted null) tidak menggagalkan analisis; err-outcome dinonaktifkan bila < 8 known', () => {
+    const rows = [
+      ...Array.from({ length: 8 }, (_, i) => ({ p: 0.3 + i * 0.02, margin: 0.4, converted: null, pTrue: 0.3 + i * 0.02 })),
+      ...Array.from({ length: 4 }, () => ({ p: 0.6, margin: 0.7, converted: true, pTrue: null })),
+    ]
+    const m = marginAnalysis(rows)!
+    expect(m.n).toBe(12)
+    expect(Number.isFinite(m.spearmanVsAbsErrOutcome)).toBe(false) // hanya 4 outcome → NaN
+    expect(m.quartiles[0].meanAbsErrTrue).not.toBeNull() // pTrue tetap dianalisis
   })
 })

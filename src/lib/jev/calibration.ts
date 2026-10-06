@@ -144,3 +144,75 @@ export function spearman(xs: number[], ys2: number[]): number {
   const d2 = rx.reduce((s, v, i) => s + (v - ry[i]) ** 2, 0)
   return 1 - (6 * d2) / (n * (n * n - 1))
 }
+
+export interface MarginQuartile {
+  n: number
+  meanMargin: number
+  meanAbsErrOutcome: number // mean |p − outcome|
+  meanAbsErrTrue: number | null // mean |p − pTrue| — null bila kuartil tanpa pTrue
+}
+
+export interface MarginAnalysis {
+  n: number
+  /** Spearman(margin, |p − outcome|) — negatif = margin tinggi ↔ prediksi lebih tepat */
+  spearmanVsAbsErrOutcome: number
+  /** Spearman(margin, |p − pTrue|) — hanya lead sintetis; null bila terlalu sedikit */
+  spearmanVsAbsErrTrue: number | null
+  quartiles: MarginQuartile[] // Q1 (margin terendah) → Q4 (tertinggi)
+}
+
+/** analisis margin (RQ3): apakah confidence pertanyaan choice membantu menilai ketepatan noul? */
+export function marginAnalysis(
+  rows: Array<{ p: number; margin?: number | null; converted: boolean | null; pTrue: number | null }>,
+): MarginAnalysis | null {
+  const usable = rows.filter((r) => Number.isFinite(r.p) && typeof r.margin === 'number')
+  if (usable.length < 8) return null
+
+  const knownOutcome = usable.filter((r) => r.converted !== null)
+  const withTrue = usable.filter((r) => typeof r.pTrue === 'number')
+  const spearmanOutcome =
+    knownOutcome.length >= 8
+      ? spearman(
+          knownOutcome.map((r) => r.margin as number),
+          knownOutcome.map((r) => Math.abs(r.p - (r.converted ? 1 : 0))),
+        )
+      : NaN
+  const spearmanTrue =
+    withTrue.length >= 8
+      ? spearman(
+          withTrue.map((r) => r.margin as number),
+          withTrue.map((r) => Math.abs(r.p - (r.pTrue as number))),
+        )
+      : null
+
+  // kuartil berdasarkan margin terurut naik
+  const sortedIdx = usable
+    .map((_, i) => i)
+    .sort((a, b) => (usable[a].margin as number) - (usable[b].margin as number))
+  const q = Math.floor(sortedIdx.length / 4)
+  const mean = (xs: number[]) => xs.reduce((s, v) => s + v, 0) / xs.length
+  const quartiles: MarginQuartile[] = []
+  for (let k = 0; k < 4; k++) {
+    const slice = k < 3 ? sortedIdx.slice(k * q, (k + 1) * q) : sortedIdx.slice(3 * q)
+    if (!slice.length) continue
+    const errsOutcome = slice
+      .map((i) => (usable[i].converted !== null ? Math.abs(usable[i].p - (usable[i].converted ? 1 : 0)) : null))
+      .filter((v): v is number => v !== null)
+    const errsTrue = slice
+      .map((i) => (typeof usable[i].pTrue === 'number' ? Math.abs(usable[i].p - (usable[i].pTrue as number)) : null))
+      .filter((v): v is number => v !== null)
+    quartiles.push({
+      n: slice.length,
+      meanMargin: mean(slice.map((i) => usable[i].margin as number)),
+      meanAbsErrOutcome: errsOutcome.length ? mean(errsOutcome) : NaN,
+      meanAbsErrTrue: errsTrue.length ? mean(errsTrue) : null,
+    })
+  }
+
+  return {
+    n: usable.length,
+    spearmanVsAbsErrOutcome: spearmanOutcome,
+    spearmanVsAbsErrTrue: spearmanTrue,
+    quartiles,
+  }
+}

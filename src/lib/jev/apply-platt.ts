@@ -19,11 +19,14 @@ export interface ScoredLeadRow {
   p: number
   pTrue: number | null
   converted: boolean | null
+  margin?: number | null
 }
 
-/** fit + ringkasan perbaikan (tanpa menulis DB) */
+/** fit + ringkasan perbaikan (tanpa menulis DB).
+ *  Fit HANYA dari lead dengan outcome diketahui — lead live (converted null)
+ *  tidak boleh dihitung sebagai "tidak konversi" karena akan menekan kurva ke bawah. */
 export function plattSummary(rows: ScoredLeadRow[]): PlattSummary | null {
-  const usable = rows.filter((r) => typeof r.p === 'number')
+  const usable = rows.filter((r) => typeof r.p === 'number' && Number.isFinite(r.p) && r.converted !== null)
   if (usable.length < 10) return null // terlalu sedikit untuk fit bermakna
 
   const ps = usable.map((r) => r.p)
