@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { MessageCircle, Sparkles, Store } from 'lucide-react'
+import { MessageCircle, PackageOpen, Sparkles, Store } from 'lucide-react'
 import Link from 'next/link'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
@@ -8,10 +8,13 @@ import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import RichText from '@/components/RichText'
+import { ProductCard } from '@/components/shop/ProductCard'
+import { toProductDTO } from '@/components/shop/types'
 import { PostHero } from '@/heros/PostHero'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { generateMeta } from '@/utilities/generateMeta'
+import type { Product } from '@/payload-types'
 import PageClient from './page.client'
 
 export async function generateStaticParams() {
@@ -44,6 +47,10 @@ export default async function Post({ params: paramsPromise }: Args) {
   const post = await queryPostBySlug({ slug: decodedSlug })
 
   if (!post) return <PayloadRedirects url={url} />
+
+  const relatedProductDocs = (post.relatedProducts || []).filter(
+    (p): p is Product => typeof p === 'object' && p !== null,
+  )
 
   return (
     <article className="min-h-screen bg-page pb-24">
@@ -100,6 +107,26 @@ export default async function Post({ params: paramsPromise }: Args) {
             </a>
           </div>
         </section>
+
+        {/* Produk Terkait — tautan produk dari artikel (brief: artikel menautkan produk) */}
+        {relatedProductDocs.length > 0 && (
+          <section aria-label="Modul Kodeva yang terkait" className="mt-14">
+            <div className="flex items-center gap-2 text-brand mb-2">
+              <PackageOpen className="h-4 w-4" />
+              <span className="text-[11.5px] font-bold uppercase tracking-wider">
+                Modul yang dibahas
+              </span>
+            </div>
+            <h2 className="font-display text-[20px] sm:text-[22px] font-bold tracking-tight text-forest mb-4 [text-wrap:balance]">
+              Pakai modul yang sama seperti di artikel ini
+            </h2>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+              {relatedProductDocs.map((p) => (
+                <ProductCard key={p.id} product={toProductDTO(p)} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Related Posts */}
         {post.relatedPosts && post.relatedPosts.length > 0 && (
