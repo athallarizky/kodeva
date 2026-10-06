@@ -87,14 +87,14 @@ export const Leads: CollectionConfig<'leads'> = {
     {
       name: 'jev',
       type: 'group',
-      label: 'Skor JEV (Riset)',
+      label: 'Potensi Konversi',
       admin: {
         description:
-          'Terisi otomatis oleh sistem riset (sprint-2). Gagal diskor = tidak menggagalkan lead.',
+          'Terisi otomatis (sistem riset — jangan diisi manual). Gagal diskor tidak menggagalkan lead.',
       },
       fields: [
         { name: 'scored', type: 'checkbox', defaultValue: false, label: 'Sudah Diskor?' },
-        { name: 'p', type: 'number', label: 'Potensi Konversi' },
+        { name: 'p', type: 'number', label: 'Skor' },
         { name: 'margin', type: 'number', label: 'Margin (confidence choice)' },
         { name: 'model', type: 'text', label: 'Versi Model' },
         { name: 'raw', type: 'json', label: 'Respons Mentah' },
