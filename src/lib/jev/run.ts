@@ -9,7 +9,7 @@ import type { PayloadRequest } from 'payload'
 import { brier, ece, eceVsTrue, reliability } from './calibration'
 import { generateBatch } from './generator'
 import { getScenario } from './scenarios'
-import { jevUpdatePayload, priorityTier, scoreLead } from './score-lead'
+import { jevUpdatePayload, priorityTier, roundScore, scoreLead } from './score-lead'
 import type { JevClient, ScenarioId } from './types'
 
 export interface RunSpec {
@@ -82,7 +82,7 @@ export async function runExperiment(spec: RunSpec): Promise<RunResult> {
     ;(update.jev as Record<string, unknown>).input = lead.features
     if (result.ok && result.decision) {
       ;(update as Record<string, unknown>).priority = priorityTier(result.decision.p)
-      ;(update as Record<string, unknown>).potensiKonversi = result.decision.p
+      ;(update as Record<string, unknown>).potensiKonversi = roundScore(result.decision.p)
     }
     await payload.update({
       collection: 'leads',

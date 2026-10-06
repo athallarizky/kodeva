@@ -28,6 +28,11 @@ export function buildLeadFeatures(lead: {
 
 export type PriorityTier = 'panas' | 'hangat' | 'dingin'
 
+/** pembulatan tampilan marketing: 0.2689672942 -> 0.27 (presisi penuh tetap di jev.*) */
+export function roundScore(v: number): number {
+  return Math.round(v * 100) / 100
+}
+
 /**
  * Tier prioritas utk marketing — dari skor efektif (pPlatt bila sudah dipasang,
  * else p mentah). Pita dikalibrasi ke dunia kodeva (mean pTrue ~0.15, skor
