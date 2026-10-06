@@ -8,6 +8,8 @@ import { AdminBar } from '@/components/AdminBar'
 import { BottomNav } from '@/components/kit/BottomNav'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
+import { TrackingDrawer } from '@/components/TrackingDrawer'
+import { UtmCapture } from '@/components/UtmCapture'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -58,10 +60,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }}
           />
 
+          <UtmCapture />
           <Header />
           {children}
           <Footer />
           <BottomNav />
+          <React.Suspense fallback={null}>
+            <TrackingDrawer />
+          </React.Suspense>
         </Providers>
       </body>
     </html>

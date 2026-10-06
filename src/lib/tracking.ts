@@ -34,3 +34,27 @@ export function trackLandingCtaClick(ctaLabel: string, ctaLocation: 'hero' | 'ba
     cta_location: ctaLocation,
   })
 }
+
+/** lihat halaman produk — HANYA sekali per produk (guard useRef di komponen) */
+export function trackViewItem(item: TrackEcommerceItem): void {
+  track({
+    event: 'view_item',
+    ecommerce: { items: [item] },
+  })
+}
+
+/** tambah ke keranjang berhasil — value = total baris (api-contract §4) */
+export function trackAddToCart(item: TrackEcommerceItem, value: number): void {
+  track({
+    event: 'add_to_cart',
+    ecommerce: { items: [item], value },
+  })
+}
+
+/** mulai checkout — sekali per intent (klik lanjut ke checkout) */
+export function trackBeginCheckout(items: TrackEcommerceItem[], value: number): void {
+  track({
+    event: 'begin_checkout',
+    ecommerce: { items, value },
+  })
+}

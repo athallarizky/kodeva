@@ -15,26 +15,36 @@ const variants: Record<Variant, string> = {
   disabled: 'bg-disabled text-white cursor-not-allowed',
 }
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   variant?: Variant
   /** tampilkan panah kanan (desain BtnPrimary) */
   arrow?: boolean
   href?: string
+  /** dipakai untuk <button> maupun <Link> */
+  onClick?: React.MouseEventHandler<HTMLElement>
 }
 
 /** Button pill kodeva — primary #2D5E3A / outline / disabled; `href` → render <Link>. */
-export const Button: React.FC<ButtonProps> = ({ variant = 'primary', arrow, href, className, children, ...rest }) => {
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
+  arrow,
+  href,
+  className,
+  children,
+  onClick,
+  ...rest
+}) => {
   const cls = cn(base, variants[variant], className)
   if (href && variant !== 'disabled') {
     return (
-      <Link href={href} className={cls}>
+      <Link href={href} className={cls} onClick={onClick}>
         {children}
         {arrow ? <ArrowRight className="h-[15px] w-[15px]" /> : null}
       </Link>
     )
   }
   return (
-    <button type="button" className={cls} {...rest}>
+    <button type="button" className={cls} onClick={onClick} {...rest}>
       {children}
       {arrow ? <ArrowRight className="h-[15px] w-[15px]" /> : null}
     </button>

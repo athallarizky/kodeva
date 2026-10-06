@@ -507,7 +507,7 @@ export const seed = async ({
             'Aplikasi kasir, HR & payroll, dan add-on untuk UMKM Indonesia. Tanpa hardware khusus, tanpa kontrak panjang — bayar per lisensi per bulan.',
           image: heroImage!.id,
           primaryCta: { label: 'Lihat Produk', href: '/produk' },
-          secondaryCta: { label: 'Baca Blog', href: '/posts' },
+          secondaryCta: { label: 'Baca Blog', href: '/blog' },
         },
         {
           blockType: 'featured-products',
@@ -570,6 +570,12 @@ export const seed = async ({
             },
           ],
         },
+        {
+          blockType: 'lead-form',
+          title: 'Konsultasi Gratis',
+          submitLabel: 'Kirim',
+          note: 'Kami balas maksimal 1×24 jam. Tanpa spam.',
+        },
       ],
       publishedAt: new Date().toISOString(),
       meta: {
@@ -588,7 +594,7 @@ export const seed = async ({
       data: {
         navItems: [
           { link: { type: 'custom', label: 'Katalog', url: '/produk' } },
-          { link: { type: 'custom', label: 'Blog', url: '/posts' } },
+          { link: { type: 'custom', label: 'Blog', url: '/blog' } },
         ],
       },
     }),
@@ -597,7 +603,7 @@ export const seed = async ({
       data: {
         navItems: [
           { link: { type: 'custom', label: 'Katalog', url: '/produk' } },
-          { link: { type: 'custom', label: 'Blog', url: '/posts' } },
+          { link: { type: 'custom', label: 'Blog', url: '/blog' } },
           { link: { type: 'custom', label: 'Admin', url: '/admin' } },
         ],
       },

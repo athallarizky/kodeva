@@ -210,6 +210,7 @@ export interface Page {
     | FeaturedProductsBlock
     | TestimonialsBlock
     | FaqBlock
+    | LeadFormBlock
     | BannerBlock
   )[];
   meta?: {
@@ -1105,6 +1106,7 @@ export interface PagesSelect<T extends boolean = true> {
         'featured-products'?: T | FeaturedProductsBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
         faq?: T | FaqBlockSelect<T>;
+        'lead-form'?: T | LeadFormBlockSelect<T>;
         banner?: T | BannerBlockSelect<T>;
       };
   meta?:
@@ -1260,6 +1262,17 @@ export interface FaqBlockSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LeadFormBlock_select".
+ */
+export interface LeadFormBlockSelect<T extends boolean = true> {
+  title?: T;
+  submitLabel?: T;
+  note?: T;
   id?: T;
   blockName?: T;
 }
@@ -1768,6 +1781,18 @@ export interface FaqBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LeadFormBlock".
+ */
+export interface LeadFormBlock {
+  title?: string | null;
+  submitLabel?: string | null;
+  note?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'lead-form';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

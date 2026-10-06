@@ -9,6 +9,7 @@ import { ContentBlock } from '@/blocks/Content/Component'
 import { FaqBlock } from '@/blocks/FAQ/Component'
 import { FeaturedProductsBlock } from '@/blocks/FeaturedProducts/Component'
 import { HeroBlock } from '@/blocks/Hero/Component'
+import { LeadFormBlock } from '@/blocks/LeadForm/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { TestimonialsBlock } from '@/blocks/Testimonials/Component'
 
@@ -20,6 +21,7 @@ const blockComponents = {
   faq: FaqBlock,
   'featured-products': FeaturedProductsBlock,
   hero: HeroBlock,
+  'lead-form': LeadFormBlock,
   mediaBlock: MediaBlock,
   testimonials: TestimonialsBlock,
 }

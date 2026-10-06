@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/media/file/**',
       },
+      {
+        // aset statis desain (hero & galeri produk) — sprint-3
+        pathname: '/images/**',
+      },
     ],
     qualities: [100],
     remotePatterns: [

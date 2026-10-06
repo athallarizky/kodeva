@@ -3,37 +3,42 @@ import React from 'react'
 import type { TestimonialsBlock as TestimonialsBlockProps } from '@/payload-types'
 import { Media } from '@/components/Media'
 
+/** Testimoni — kartu putih, avatar inisial hijau (desain kodeva-ui). */
 export const TestimonialsBlock: React.FC<TestimonialsBlockProps> = ({ title, items }) => {
   if (!items?.length) return null
 
   return (
     <div className="container">
-      {title && <h2 className="mb-6 text-2xl font-bold tracking-tight md:text-3xl">{title}</h2>}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {items.map(({ quote, name, role, avatar }) => (
+      {title && (
+        <h2 className="mb-[14px] font-display text-[19px] font-bold text-forest md:text-[22px]">
+          {title}
+        </h2>
+      )}
+      <div className="grid grid-cols-1 gap-[12px] md:grid-cols-3">
+        {items.map(({ quote, name, role, avatar }, i) => (
           <figure
-            key={name}
-            className="border-border bg-card flex h-full flex-col gap-4 rounded-lg border p-6"
+            key={`${name}-${i}`}
+            className="flex h-full flex-col gap-[12px] rounded-[14px] bg-white p-[16px] shadow-card outline outline-1 outline-line outline-offset-[-0.5px]"
           >
-            <blockquote className="text-foreground/90 flex-1 text-sm leading-relaxed">
+            <blockquote className="flex-1 text-[12.5px] leading-relaxed text-forest">
               &ldquo;{quote}&rdquo;
             </blockquote>
-            <figcaption className="flex items-center gap-3">
+            <figcaption className="flex items-center gap-[10px]">
               {avatar && typeof avatar !== 'string' ? (
                 <Media
                   resource={avatar}
-                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full"
-                  imgClassName="h-10 w-10 rounded-full object-cover"
+                  className="h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full"
+                  imgClassName="h-[36px] w-[36px] rounded-full object-cover"
                 />
               ) : (
-                <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold">
+                <span className="flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full bg-tint-2 text-[13px] font-bold text-forest">
                   {name.charAt(0)}
-                </div>
+                </span>
               )}
-              <div className="text-sm">
-                <div className="font-medium">{name}</div>
-                {role && <div className="text-muted-foreground">{role}</div>}
-              </div>
+              <span className="flex flex-col">
+                <span className="text-[12.5px] font-bold text-forest">{name}</span>
+                {role ? <span className="text-[11px] text-sage">{role}</span> : null}
+              </span>
             </figcaption>
           </figure>
         ))}

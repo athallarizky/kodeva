@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import React from 'react'
 
 import type { FaqBlock as FaqBlockProps } from '@/payload-types'
@@ -19,20 +20,25 @@ export const FaqBlock: React.FC<FaqBlockProps> = ({ title, items }) => {
 
   return (
     <div className="container">
-      {title && <h2 className="mb-6 text-2xl font-bold tracking-tight md:text-3xl">{title}</h2>}
-      <div className="flex flex-col gap-3">
+      {title && (
+        <h2 className="mb-[14px] font-display text-[19px] font-bold text-forest md:text-[22px]">
+          {title}
+        </h2>
+      )}
+      <div className="flex flex-col gap-[10px]">
         {items.map(({ question, answer }, i) => (
           <details
             key={i}
-            className="border-border bg-card group rounded-lg border px-5 py-4 [&_summary::-webkit-details-marker]:hidden"
+            className="group rounded-[14px] bg-white px-[16px] py-[13px] shadow-card outline outline-1 outline-line outline-offset-[-0.5px] [&_summary::-webkit-details-marker]:hidden"
           >
-            <summary className="flex cursor-pointer items-center justify-between gap-4 font-medium">
+            <summary className="flex cursor-pointer items-center justify-between gap-[12px] text-[13px] font-bold text-forest">
               {question}
-              <span className="text-muted-foreground group-open:rotate-45 transition-transform" aria-hidden>
-                +
-              </span>
+              <ChevronDown
+                className="h-[15px] w-[15px] shrink-0 text-sage transition-transform group-open:rotate-180"
+                aria-hidden
+              />
             </summary>
-            <p className="text-muted-foreground mt-3 leading-relaxed">{answer}</p>
+            <p className="mt-[8px] text-[12.5px] leading-relaxed text-sage">{answer}</p>
           </details>
         ))}
       </div>
