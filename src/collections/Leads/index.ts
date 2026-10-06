@@ -87,14 +87,14 @@ export const Leads: CollectionConfig<'leads'> = {
     {
       name: 'jev',
       type: 'group',
-      label: 'Potensi Konversi',
+      label: false, // tanpa nama — kolom list & form tampil satu tingkat (tanpa "grup >")
       admin: {
         description:
           'Terisi otomatis (sistem riset — jangan diisi manual). Gagal diskor tidak menggagalkan lead.',
       },
       fields: [
         { name: 'scored', type: 'checkbox', defaultValue: false, label: 'Sudah Diskor?' },
-        { name: 'p', type: 'number', label: 'Skor' },
+        { name: 'p', type: 'number', label: 'Potensi Konversi' },
         { name: 'margin', type: 'number', label: 'Margin (confidence choice)' },
         { name: 'model', type: 'text', label: 'Versi Model' },
         { name: 'raw', type: 'json', label: 'Respons Mentah' },
