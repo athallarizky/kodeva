@@ -44,7 +44,32 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+
+  /* ── Kodeva design tokens (kodeva-ui, sprint-3) ─────────────────────── */
+  --font-display: var(--font-funnel);
+
+  --color-forest: #1b3a28; /* teks utama, chip aktif, footer */
+  --color-brand: #2d5e3a; /* button primary, radio on, step aktif */
+  --color-pine: #4a6b52;
+  --color-sage: #7a9a80; /* teks muted / placeholder */
+  --color-line: #d6ddd0; /* outline kartu & field */
+  --color-tint: #eef4e8;
+  --color-tint-2: #dce9d2;
+  --color-tint-3: #c8dbbc;
+  --color-page: #f5f3ee; /* background halaman */
+  --color-warn: #96591b;
+  --color-warn-bg: #fcefdc;
+  --color-warn-line: #e8c99e;
+  --color-warn-accent: #e3a008;
+  --color-danger: #b3402f;
+  --color-danger-bg: #f6e0dc;
+  --color-disabled: #b9c9b5;
+  --color-skeleton: #e9e6dd;
+
+  --shadow-card: 0 2px 6px #1b3a280a;
+  --shadow-seg: 0 1px 3px #1b3a2814;
+  --shadow-pop: 0 10px 28px #1b3a281f;
 }
 
 @layer utilities {

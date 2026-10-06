@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
+import { Funnel_Sans, Inter } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { BottomNav } from '@/components/kit/BottomNav'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
@@ -15,6 +15,20 @@ import { draftMode } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+
+// Font desain kodeva-ui: Inter (body/UI) + Funnel Sans (display/heading)
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const funnel = Funnel_Sans({
+  subsets: ['latin'],
+  variable: '--font-funnel',
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+})
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
@@ -29,14 +43,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="id" suppressHydrationWarning>
+    <html className={cn(inter.variable, funnel.variable)} lang="id" suppressHydrationWarning>
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
-      <body>
+      <body className="bg-page font-sans text-forest antialiased">
         <Providers>
           <AdminBar
             adminBarProps={{
@@ -47,6 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           {children}
           <Footer />
+          <BottomNav />
         </Providers>
       </body>
     </html>
