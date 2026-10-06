@@ -42,15 +42,15 @@ export const Leads: CollectionConfig<'leads'> = {
       // dihitung otomatis dari skor (pPlatt bila ada, else p) — untuk urutan follow-up marketing
       name: 'priority',
       type: 'select',
-      label: 'Prioritas',
+      label: 'Prioritas Dihubungi',
       options: [
-        { label: '🔥 Panas — hubungi hari ini', value: 'panas' },
-        { label: '🌤️ Hangat — 1–3 hari', value: 'hangat' },
-        { label: '❄️ Dingin — minggu ini', value: 'dingin' },
+        { label: '🔴 Tinggi', value: 'panas' },
+        { label: '🟡 Sedang', value: 'hangat' },
+        { label: '🟢 Rendah', value: 'dingin' },
       ],
       admin: {
         readOnly: true,
-        description: 'Diisi otomatis dari skor. Urutan daftar mengikuti kolom ini.',
+        description: 'Diisi otomatis dari skor. Hubungi urutan atas lebih dulu.',
       },
     },
     {
@@ -94,7 +94,7 @@ export const Leads: CollectionConfig<'leads'> = {
       },
       fields: [
         { name: 'scored', type: 'checkbox', defaultValue: false, label: 'Sudah Diskor?' },
-        { name: 'p', type: 'number', label: 'p (probabilitas konversi)' },
+        { name: 'p', type: 'number', label: 'Potensi Konversi' },
         { name: 'margin', type: 'number', label: 'Margin (confidence choice)' },
         { name: 'model', type: 'text', label: 'Versi Model' },
         { name: 'raw', type: 'json', label: 'Respons Mentah' },
