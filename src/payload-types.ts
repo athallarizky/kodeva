@@ -381,6 +381,19 @@ export interface Lead {
       | boolean
       | null;
     scoredAt?: string | null;
+    input?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    latencyMs?: number | null;
+    scenario?: string | null;
+    pTrue?: number | null;
+    pPlatt?: number | null;
   } | null;
   outcome?: {
     converted?: boolean | null;
@@ -491,6 +504,11 @@ export interface LeadsSelect<T extends boolean = true> {
         model?: T;
         raw?: T;
         scoredAt?: T;
+        input?: T;
+        latencyMs?: T;
+        scenario?: T;
+        pTrue?: T;
+        pPlatt?: T;
       };
   outcome?:
     | T

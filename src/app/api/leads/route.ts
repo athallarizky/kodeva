@@ -48,7 +48,30 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     req: { context: {} } as PayloadRequest, // server-side: tanpa user session
   })
 
-  // 4) (sprint-2) scoreLead(lead) — advisory, try/catch, TIDAK menggagalkan lead
+  // 4) Skor JEV — advisory (gagal TIDAK menggagalkan lead; sprint-2 live pipeline)
+  try {
+    const { RealJevClient } = await import('@/lib/jev/client')
+    const { buildLeadFeatures, jevUpdatePayload, scoreLead } = await import('@/lib/jev/score-lead')
+    const features = buildLeadFeatures({
+      utm: input.utm ?? {},
+      landingPath: input.landingPath,
+      contact: input.contact,
+      createdAt: new Date().toISOString(),
+      name: input.name,
+      formElapsedMs: input.elapsedMs,
+    })
+    const result = await scoreLead(features, new RealJevClient())
+    const update = jevUpdatePayload(result, 'live')
+    ;(update.jev as Record<string, unknown>).input = features
+    await payload.update({
+      collection: 'leads',
+      id: lead.id,
+      data: update,
+      req: { context: {} } as PayloadRequest,
+    })
+  } catch {
+    // advisory-only: biarkan jev.scored=false — lead tetap valid
+  }
 
   // 5) Sukses
   return NextResponse.json({ ok: true, leadId: lead.id }, { status: 201 })

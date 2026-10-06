@@ -80,7 +80,7 @@ export const Leads: CollectionConfig<'leads'> = {
       fields: [
         { name: 'scored', type: 'checkbox', defaultValue: false, label: 'Sudah Diskor?' },
         { name: 'p', type: 'number', label: 'p (probabilitas konversi)' },
-        { name: 'margin', type: 'number', label: 'Margin' },
+        { name: 'margin', type: 'number', label: 'Margin (confidence choice)' },
         { name: 'model', type: 'text', label: 'Versi Model' },
         { name: 'raw', type: 'json', label: 'Respons Mentah' },
         {
@@ -90,6 +90,27 @@ export const Leads: CollectionConfig<'leads'> = {
           admin: {
             date: { pickerAppearance: 'dayAndTime' },
           },
+        },
+        // --- sprint-2 audit fields (schema.md §1.2) ---
+        { name: 'input', type: 'json', label: 'Fitur Terkirim (snapshot)' },
+        { name: 'latencyMs', type: 'number', label: 'Latency (ms)' },
+        {
+          name: 'scenario',
+          type: 'text',
+          label: 'Skenario',
+          admin: { description: 'baseline | drift-source | drift-price | live' },
+        },
+        {
+          name: 'pTrue',
+          type: 'number',
+          label: 'pTrue (ground truth generator)',
+          admin: { description: 'Hanya lead sintetis — Jev tidak pernah melihat ini', readOnly: true },
+        },
+        {
+          name: 'pPlatt',
+          type: 'number',
+          label: 'pPlatt (post-hoc wrapper)',
+          admin: { readOnly: true },
         },
       ],
     },
