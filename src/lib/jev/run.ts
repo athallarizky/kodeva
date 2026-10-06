@@ -82,6 +82,7 @@ export async function runExperiment(spec: RunSpec): Promise<RunResult> {
     ;(update.jev as Record<string, unknown>).input = lead.features
     if (result.ok && result.decision) {
       ;(update as Record<string, unknown>).priority = priorityTier(result.decision.p)
+      ;(update as Record<string, unknown>).potensiKonversi = result.decision.p
     }
     await payload.update({
       collection: 'leads',

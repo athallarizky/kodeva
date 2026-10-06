@@ -65,6 +65,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ;(update.jev as Record<string, unknown>).input = features
     if (result.ok && result.decision) {
       ;(update as Record<string, unknown>).priority = priorityTier(result.decision.p)
+      ;(update as Record<string, unknown>).potensiKonversi = result.decision.p
     }
     await payload.update({
       collection: 'leads',

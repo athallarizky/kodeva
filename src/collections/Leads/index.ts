@@ -17,7 +17,7 @@ export const Leads: CollectionConfig<'leads'> = {
     update: isAdmin,
   },
   admin: {
-    defaultColumns: ['name', 'contact', 'priority', 'jev.p', 'createdAt'],
+    defaultColumns: ['name', 'contact', 'priority', 'potensiKonversi', 'createdAt'],
     useAsTitle: 'name',
     description:
       'Prospect dari form landing page. Skor = perkiraan minat, BUKAN jaminan — hubungi urutan atas lebih dulu; skor rendah tetap layak dihubungi, cuma belakangan.',
@@ -54,6 +54,16 @@ export const Leads: CollectionConfig<'leads'> = {
       },
     },
     {
+      // kolom tampilan marketing: skor efektif (pPlatt bila terpasang, else p)
+      name: 'potensiKonversi',
+      type: 'number',
+      label: 'Potensi Konversi',
+      admin: {
+        readOnly: true,
+        description: 'Diisi otomatis — perkiraan 0–1, bukan jaminan. Detail riset ada di grup Data Riset.',
+      },
+    },
+    {
       name: 'utm',
       type: 'group',
       label: 'Atribusi UTM',
@@ -87,14 +97,14 @@ export const Leads: CollectionConfig<'leads'> = {
     {
       name: 'jev',
       type: 'group',
-      label: false, // tanpa nama — kolom list & form tampil satu tingkat (tanpa "grup >")
+      label: 'Data Riset (internal)',
       admin: {
         description:
-          'Terisi otomatis (sistem riset — jangan diisi manual). Gagal diskor tidak menggagalkan lead.',
+          'Terisi otomatis oleh sistem riset — jangan diisi manual. Gagal diskor tidak menggagalkan lead.',
       },
       fields: [
         { name: 'scored', type: 'checkbox', defaultValue: false, label: 'Sudah Diskor?' },
-        { name: 'p', type: 'number', label: 'Potensi Konversi' },
+        { name: 'p', type: 'number', label: 'Skor Mentah (p)' },
         { name: 'margin', type: 'number', label: 'Margin (confidence choice)' },
         { name: 'model', type: 'text', label: 'Versi Model' },
         { name: 'raw', type: 'json', label: 'Respons Mentah' },

@@ -75,8 +75,9 @@ export async function applyPlatt(
       collection: 'leads',
       id: doc.id,
       data: {
-        // re-tier dari skor terkoreksi Platt
+        // re-tier + kolom tampilan mengikuti skor terkoreksi Platt
         priority: priorityTier(pPlatt),
+        potensiKonversi: pPlatt,
         jev: {
           ...doc.jev,
           pPlatt,

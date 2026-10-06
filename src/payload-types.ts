@@ -356,6 +356,7 @@ export interface Lead {
   name: string;
   contact: string;
   priority?: ('panas' | 'hangat' | 'dingin') | null;
+  potensiKonversi?: number | null;
   utm?: {
     source?: string | null;
     medium?: string | null;
@@ -484,6 +485,7 @@ export interface LeadsSelect<T extends boolean = true> {
   name?: T;
   contact?: T;
   priority?: T;
+  potensiKonversi?: T;
   utm?:
     | T
     | {
