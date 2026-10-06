@@ -129,6 +129,40 @@ export const Posts: CollectionConfig<'posts'> = {
               hasMany: true,
               relationTo: 'categories',
             },
+            {
+              name: 'relatedProducts',
+              type: 'relationship',
+              admin: {
+                position: 'sidebar',
+                description: 'Produk yang dibahas — dirender sebagai kartu CTA di akhir artikel',
+              },
+              hasMany: true,
+              maxRows: 4,
+              relationTo: 'products',
+              label: 'Produk Terkait',
+            },
+            {
+              name: 'publishAt',
+              type: 'date',
+              admin: {
+                date: {
+                  pickerAppearance: 'dayAndTime',
+                },
+                position: 'sidebar',
+              },
+              label: 'Tayang Pada',
+            },
+            {
+              name: 'unpublishAt',
+              type: 'date',
+              admin: {
+                date: {
+                  pickerAppearance: 'dayAndTime',
+                },
+                position: 'sidebar',
+              },
+              label: 'Berakhir Tayang Pada',
+            },
           ],
           label: 'Meta',
         },

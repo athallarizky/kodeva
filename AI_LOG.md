@@ -47,6 +47,12 @@ Format per entry: apa yang AI hasilkan → bagaimana ketahuan → cara perbaiki 
 **Cara perbaiki:** Sparse-clone ulang di **tag v3.90.2** → `diff -rq` (±50 file drift → replace-wholesale, bukan tambal per-file) → ganti `src/` (keep favicon) → pasang ulang adapter postgres + 3 path tsconfig + `next.config.ts` template.
 **Verifikasi akhir:** `GET /` 200 + `GET /admin` 200, log `Pulling schema from database ✓` (push schema ke Neon sukses), title kedua halaman render benar. RCA: `docs/sprint-1/rca/2026-10-06-scaffold-template-main-vs-tag-mismatch.md` (handbook).
 
+### 3.6 — Dev dijalankan background saat drizzle push bertanya interaktif (2026-10-06, Phase 1.1)
+**Apa yang AI hasilkan:** Setelah drop 3 plugin + tambah 3 collections, AI menjalankan `npm run dev` sebagai background process dan meninggalkannya — padahal mode `push` drizzle-kit mengeluarkan prompt interaktif ("create or rename enum/table?") yang menunggu jawaban. Beberapa siklus restart brutal di tengah prompt meninggalkan state schema setengah-teraplikasi.
+**Bagaimana ketahuan:** Request hang 90–117 detik lalu `payloadInitError: constraint "payload_locked_documents_rels_forms_fk" does not exist` — run berikutnya berasumsi constraint lama masih ada. Inspeksi `information_schema` via node+pg membuktikan diff tersisa: kolom `forms_id/form_submissions_id/search_id` masih ada, `products_id/leads_id/vouchers_id` belum.
+**Cara perbaiki:** (1) prompt bisa dijawab di PTY palsu: `script -q /dev/null` + kirim `\r` berkala; (2) sisa diff diselesaikan manual via SQL idempoten (ADD/DROP COLUMN + DROP TYPE) — lengkap di RCA §6.
+**Verifikasi akhir:** boot berikutnya `Pulling schema ✓` tanpa prompt; `/admin`, `/api/products`, `/api/vouchers` 200; `/api/leads` 403 untuk anonim (access control bekerja); `tsc --noEmit` + `next build` lulus. RCA: `docs/sprint-1/rca/2026-10-06-drizzle-push-interactive-prompt.md` (handbook). Bonus temuan: ID postgres Payload = **integer** — desain cart (`productId: number`) ternyata tepat.
+
 ## 4. Implementasi yang banyak dibantu AI + edge case yang diuji
 - **Scaffold & wiring (sprint-1 Phase 0.1, 2026-10-06):** merge template resmi + swap adapter postgres + resolusi dependency (dedupe tsx). Edge yang diuji: boot `next dev` (lulus), perintah CLI payload standalone (gagal → RCA + bypass strategis), 3 varian undici × 2 versi Node (gagal konsisten — memuluskan isolasi penyebab ke loader, bukan versi).
 - *(target berikutnya — sprint-1: validasi kuota agregat lintas paket + hydration keranjang persist; diisi setelah Phase 5 & 7)*
