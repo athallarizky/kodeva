@@ -8,8 +8,8 @@ import { toProductDTO } from '@/components/shop/types'
 import { SkeletonGrid } from '@/components/kit/SkeletonCard'
 
 export const metadata: Metadata = {
-  title: 'Katalog — kodeva',
-  description: 'Aplikasi kasir, HR & payroll, dan add-on untuk UMKM Indonesia.',
+  title: 'Katalog Modul & Lisensi — kodeva',
+  description: 'Software operasional terintegrasi: aplikasi kasir, sistem HR & payroll, dan modul add-on siap pakai untuk UMKM Indonesia.',
 }
 
 export default async function ProdukPage() {
@@ -23,10 +23,10 @@ export default async function ProdukPage() {
   const products = docs.map(toProductDTO)
 
   return (
-    <main className="bg-page">
+    <main className="bg-page min-h-[calc(100vh-140px)]">
       <Suspense
         fallback={
-          <div className="container py-6">
+          <div className="container py-8 sm:py-12">
             <SkeletonGrid count={6} />
           </div>
         }

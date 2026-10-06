@@ -23,28 +23,28 @@ export const BottomNav: React.FC = () => {
   const onKeranjang = pathname === '/keranjang'
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line/70 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden shadow-lg">
       <Link
         href="/produk"
         className={cn(
-          'flex flex-1 flex-col items-center gap-[3px] py-[9px] text-[10.5px]',
-          onKatalog ? 'text-forest' : 'text-sage',
+          'flex flex-1 flex-col items-center justify-center gap-1 min-h-[50px] py-2 text-[11px] transition-colors active:scale-95',
+          onKatalog ? 'text-forest font-semibold' : 'text-sage hover:text-forest',
         )}
       >
-        <Store className="h-[19px] w-[19px]" />
-        Katalog
+        <Store className={cn('h-5 w-5 transition-transform', onKatalog ? 'text-brand stroke-[2.2]' : 'text-sage')} />
+        <span>Katalog</span>
       </Link>
       <Link
         href="/keranjang"
         className={cn(
-          'relative flex flex-1 flex-col items-center gap-[3px] py-[9px] text-[10.5px]',
-          onKeranjang ? 'text-forest' : 'text-sage',
+          'relative flex flex-1 flex-col items-center justify-center gap-1 min-h-[50px] py-2 text-[11px] transition-colors active:scale-95',
+          onKeranjang ? 'text-forest font-semibold' : 'text-sage hover:text-forest',
         )}
       >
-        <ShoppingCart className="h-[19px] w-[19px]" />
-        Keranjang
+        <ShoppingCart className={cn('h-5 w-5 transition-transform', onKeranjang ? 'text-brand stroke-[2.2]' : 'text-sage')} />
+        <span>Keranjang</span>
         {count > 0 ? (
-          <span className="absolute right-[calc(50%-24px)] top-[5px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-danger px-1 text-[9.5px] font-bold leading-none text-white">
+          <span className="absolute right-[calc(50%-22px)] top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9.5px] font-bold leading-none text-white shadow-2xs">
             {count > 99 ? '99+' : count}
           </span>
         ) : null}

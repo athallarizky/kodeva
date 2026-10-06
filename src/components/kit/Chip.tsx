@@ -11,8 +11,10 @@ export const Chip: React.FC<ChipProps> = ({ active, className, children, ...rest
   <button
     type="button"
     className={cn(
-      'shrink-0 rounded-full px-[14px] py-[8px] text-[12.5px] leading-none transition-colors',
-      active ? 'bg-forest text-white' : 'bg-white text-forest outline outline-1 outline-line outline-offset-[-0.5px] hover:bg-tint',
+      'inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 py-2 text-[12.5px] font-medium leading-none transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 active:scale-[0.97]',
+      active
+        ? 'bg-forest text-white shadow-2xs border border-forest font-semibold'
+        : 'bg-white text-forest border border-line hover:border-brand/30 hover:bg-tint/50',
       className,
     )}
     {...rest}
