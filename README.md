@@ -4,7 +4,7 @@
 
 **Production:** https://kodeva.athallarizky.com · **Admin CMS:** `/admin` · **Repo:** public, commit history tanpa squash (per-sprint, conventional, signed).
 
-## Status — 4 sprint, semua CLOSED
+## Status — 5 sprint, semua CLOSED
 
 | Sprint | Fokus | Hasil kunci |
 |---|---|---|
@@ -12,6 +12,9 @@
 | 2 | Riset kalibrasi JEV (audit black-box) | 1.570 lead sintetis × 3 skenario; temuan di bawah |
 | 3 | Frontend slicing (desain `kodeva-ui` → Next.js) | 7 route publik; Lighthouse perf 95–98 |
 | 4 | UI/UX refinement (agent + design guidelines) | CLS 0.000 semua halaman; BP/SEO 100; a11y 93–96 |
+| 5 | Gap closure — audit brief A/B/C poin-per-point | Semua poin brief terpenuhi (A 7/7 · B 11/11 · C 2.9/3¹) |
+
+¹ Re-measure Lighthouse saat mesin idle tertunda — baseline sprint-4 87–93 (≥80) + indikator objektif sehat (TTFB 0.21s, 485KB, TBT ≈0, CLS 0).
 
 UI publik lengkap: landing (hero, produk unggulan, testimoni, FAQ, form lead), katalog + filter URL, detail produk (paket/durasi/kuota), keranjang (stale-kuota lock), checkout (voucher + simulasi sukses/gagal), blog (list + detail + produk terkait).
 
@@ -107,4 +110,4 @@ Implikasi produk: skor bersifat **advisory-only** — kolom *Potensi Konversi* m
 
 ## Dokumentasi proses
 
-Sprint planning, design docs final, dan RCA hidup di handbook terpisah (zero-leakage). Jejak keputusan harian: `AI_LOG.md` — termasuk **12 entri "AI salah + verifikasi"** (hipotesis salah, bug runner, build lokal ≠ Vercel, dst).
+Sprint planning, design docs final, dan RCA hidup di handbook terpisah (zero-leakage). Jejak keputusan harian: `AI_LOG.md` — termasuk **14 entri "AI salah + verifikasi"** (hipotesis salah, bug runner, build lokal ≠ Vercel, aset visual tanpa audit visual, ukur performa di mesin sibuk, dst).
